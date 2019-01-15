@@ -4,6 +4,7 @@
   "description": "FolloThru server",
   "main": "index.js",
   "scripts": {
+    "start": "node src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +21,8 @@
   },
   "homepage": "https://github.com/ChrisXJH/follothru-backend#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.1"
   }
 }
