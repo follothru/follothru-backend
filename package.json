@@ -4,7 +4,9 @@
   "description": "FolloThru server",
   "main": "index.js",
   "scripts": {
+    "bootstrap": "npm install && node src",
     "start": "node src",
+    "clean": "npm cache verify",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
