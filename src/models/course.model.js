@@ -1,13 +1,10 @@
-const { BaseModel } = require('./base.model.js');
+const mongoose = require('mongoose');
+const { UserSchema } = require('./user.model.js');
 
-class CourseModel extends BaseModel {
-  constructor() {
-    super();
+const courseSchema = mongoose.Schema({
+  name: String,
+  description: String,
+  instructors: [UserSchema]
+});
 
-    this.id;
-    this.name;
-    this.description;
-  }
-}
-
-module.exports = { CourseModel };
+module.exports = mongoose.model('CourseModel', courseSchema);

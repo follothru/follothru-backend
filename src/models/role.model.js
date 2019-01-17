@@ -1,12 +1,7 @@
-const { BaseModel } = require('./base.model.js');
+const mongoose = require('mongoose');
 
-class RoleModel extends BaseModel {
-  constructor() {
-    super();
+const roleSchema = mongoose.Schema({
+  name: String
+});
 
-    this.id;
-    this.name;
-  }
-}
-
-module.exports = { RoleModel };
+module.exports = mongoose.model('RoleModel', roleSchema);

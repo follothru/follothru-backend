@@ -1,11 +1,10 @@
-const { BaseModel } = require('./base.model.js');
+const mongoose = require('mongoose');
 
-class ReminderModel extends BaseModel {
-  constructor() {
-    super();
+const ReminderSchema = mongoose.Schema({
+  name: String,
+  remindDate: Date
+});
 
-    this.id;
-  }
-}
+const ReminderModel = mongoose.model('ReminderModel', ReminderSchema);
 
-module.exports = { ReminderModel };
+module.exports = { ReminderModel, ReminderSchema };
