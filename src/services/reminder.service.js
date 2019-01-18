@@ -3,7 +3,13 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllReminders() {
-    return ReminderModel.find();
+    return ReminderModel.find().then(reminders =>
+      reminders.map(reminder => {
+        const id = reminder._id;
+        const name = reminder.name;
+        return { id, name };
+      })
+    );
   }
 
   function createReminder(name) {
@@ -13,7 +19,7 @@ module.exports = (() => {
         const newReminder = new ReminderModel({ name });
         newReminder
           .save()
-          .then(result => resolve(result._id))
+          .then(result => resolve({ id: result._id }))
           .catch(err => reject(err));
       } catch (err) {
         reject(err);
