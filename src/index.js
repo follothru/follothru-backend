@@ -1,7 +1,24 @@
+const mongoose = require('mongoose');
 const express = require('express');
+const bodyParser = require('body-parser');
+const { ReminderApi } = require('./apis');
+const { port, mongodbUrl } = require('./configs/config.js');
 const app = express();
-const port = 3000;
 
-app.get('/', (req, res) => res.send('Hello World!'));
+mongoose.connect(
+  mongodbUrl,
+  { useNewUrlParser: true }
+);
+
+app.use(bodyParser.json());
+
+app.use('/reminder', ReminderApi);
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
