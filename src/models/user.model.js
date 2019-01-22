@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
-const CourseModel = require('./course.model.js');
+const { CourseSchema } = require('./course.model.js');
 
 const UserSchema = mongoose.Schema({
-  username: String,
+  _id: mongoose.Schema.Types.ObjectId,
+  firstname: String,
+  lastname: String,
   password: String,
-  email: String,
-  courses: [CourseModel]
+  email: String
+  // courses: [CourseSchema]
 });
 
 const UserModel = mongoose.model('UserModel', UserSchema);
