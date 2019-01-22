@@ -1,0 +1,6 @@
+{
+  // Prettier uses single quotes.
+  "prettier.singleQuote": true,
+  // Prettify on save
+  "editor.formatOnSave": true
+}
