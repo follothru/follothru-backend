@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
-const { ReminderApi } = require('./apis');
+const { ReminderApi, CourseApi, UserApi } = require('./apis');
 const { port, mongodbUrl } = require('./configs/config.js');
 const app = express();
 
@@ -13,6 +13,10 @@ mongoose.connect(
 app.use(bodyParser.json());
 
 app.use('/reminder', ReminderApi);
+
+app.use('/course', CourseApi);
+
+app.use('/user', UserApi);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
