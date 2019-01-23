@@ -1,16 +1,10 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
-  const { UserModel } = require('../models/user.model.js');
+  const UserModel = require('../models/user.model.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllUsers() {
-    return UserModel.find().then(users =>
-      users.map(user => {
-        const id = user._id;
-        const { firstname, lastname, email } = user;
-        return { id, firstname, lastname, email };
-      })
-    );
+    return UserModel.find();
   }
 
   function createUser(firstname, lastname, email, password) {
@@ -30,7 +24,7 @@ module.exports = (() => {
         });
         newUser
           .save()
-          .then(result => resolve({ id: result._id }))
+          .then(resolve)
           .catch(err => reject(err));
       } catch (err) {
         reject(err);

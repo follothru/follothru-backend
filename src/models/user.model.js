@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { CourseSchema } = require('./course.model.js');
 
 const UserSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
@@ -10,6 +9,4 @@ const UserSchema = mongoose.Schema({
   // courses: [CourseSchema]
 });
 
-const UserModel = mongoose.model('UserModel', UserSchema);
-
-module.exports = { UserModel, UserSchema };
+module.exports = mongoose.model('UserModel', UserSchema);
