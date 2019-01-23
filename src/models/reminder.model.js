@@ -5,6 +5,4 @@ const ReminderSchema = mongoose.Schema({
   remindDate: Date
 });
 
-const ReminderModel = mongoose.model('ReminderModel', ReminderSchema);
-
-module.exports = { ReminderModel, ReminderSchema };
+module.exports = mongoose.model('ReminderModel', ReminderSchema);

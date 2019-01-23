@@ -1,5 +1,5 @@
 module.exports = (() => {
-  const { ReminderModel } = require('../models/reminder.model.js');
+  const ReminderModel = require('../models/reminder.model.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllReminders() {
