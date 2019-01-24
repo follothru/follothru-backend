@@ -11,14 +11,16 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
-        const instructors = instructorIds.map(
-          id => new mongoose.Types.ObjectId(id)
-        );
+        const instructors = instructorIds
+          ? instructorIds.map(id => new mongoose.Types.ObjectId(id))
+          : [];
         const _id = new mongoose.Types.ObjectId();
+        const active = false;
         const newCourse = new CourseModel({
           _id,
           name,
           description,
+          active,
           instructors
         });
         newCourse
