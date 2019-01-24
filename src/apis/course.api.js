@@ -15,9 +15,9 @@ module.exports = (() => {
             const { firstname, lastname, email } = instructor;
             return { id, firstname, lastname, email };
           });
-          res.send({ id, name, description, instructors });
         })
       )
+      .then(courses => res.send(courses))
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
