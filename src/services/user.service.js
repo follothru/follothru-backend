@@ -3,6 +3,10 @@ module.exports = (() => {
   const UserModel = require('../models/user.model.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
+  class DuplicatedUserError extends Error {}
+
+  const Errors = { DuplicatedUserError };
+
   function findAllUsers() {
     return UserModel.find();
   }
@@ -14,25 +18,39 @@ module.exports = (() => {
         ValidationUtils.notNullOrEmpty(lastname);
         ValidationUtils.notNullOrEmpty(email);
         ValidationUtils.notNullOrEmpty(password);
-        const _id = new mongoose.Types.ObjectId();
-        const newUser = new UserModel({
-          _id,
-          firstname,
-          lastname,
-          email,
-          password
-        });
-        newUser
-          .save()
-          .then(resolve)
-          .catch(err => reject(err));
+        findUserByEmail(email)
+          .then(user => {
+            if (user) {
+              reject(
+                new DuplicatedUserError(`Duplicated user with email: ${email}`)
+              );
+              return;
+            }
+            const _id = new mongoose.Types.ObjectId();
+            const newUser = new UserModel({
+              _id,
+              firstname,
+              lastname,
+              email,
+              password
+            });
+            newUser.groups = [newUser.UserGroup.INSTRUCTOR];
+            newUser
+              .save()
+              .then(resolve)
+              .catch(reject);
+          })
+          .catch(reject);
       } catch (err) {
         reject(err);
       }
     });
   }
 
-  // array of ids
+  function findUserByEmail(email) {
+    return UserModel.findOne({ email });
+  }
+
   function findUsersByIds(ids) {
     const objectIds = ids.map(id => {
       return new mongoose.Types.ObjectId(id);
@@ -46,5 +64,5 @@ module.exports = (() => {
     });
   }
 
-  return { findAllUsers, createUser, findUsersByIds };
+  return { findAllUsers, createUser, findUsersByIds, Errors };
 })();
