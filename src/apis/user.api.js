@@ -12,8 +12,8 @@ module.exports = (() => {
       promise = UserService.findAllUsers().then(userModels =>
         userModels.map(userModel => {
           const id = userModel._id;
-          const { firstname, lastname, email } = userModel;
-          return { id, firstname, lastname, email };
+          const { firstname, lastname, email, groups } = userModel;
+          return { id, firstname, lastname, email, groups };
         })
       );
     }
@@ -33,7 +33,12 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        const { message } = err;
+        let status = 500;
+        if (err instanceof UserService.Errors.DuplicatedUserError) {
+          status = 400;
+        }
+        res.status(status).send({ status, message });
       });
   });
 

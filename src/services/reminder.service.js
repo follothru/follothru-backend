@@ -1,4 +1,5 @@
 module.exports = (() => {
+  const mongoose = require('mongoose');
   const ReminderModel = require('../models/reminder.model.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
@@ -10,6 +11,23 @@ module.exports = (() => {
         return { id, name };
       })
     );
+  }
+
+  function createReminders(remindersToCreate) {
+    return new Promise((resolve, reject) => {
+      const createPromises = remindersToCreate
+        .map(reminderConfig => {
+          const _id = new mongoose.Types.ObjectId();
+          const { name, date } = reminderConfig;
+          return new ReminderModel({ _id, name, date });
+        })
+        .map(reminderModels => reminderModels.save());
+      Promise.all(createPromises)
+        .then(newReminders => {
+          resolve(newReminders);
+        })
+        .catch(reject);
+    });
   }
 
   function createReminder(name) {
@@ -27,5 +45,5 @@ module.exports = (() => {
     });
   }
 
-  return { findAllReminders, createReminder };
+  return { findAllReminders, createReminder, createReminders };
 })();
