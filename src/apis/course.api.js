@@ -11,10 +11,11 @@ module.exports = (() => {
           const name = course.name;
           const description = course.description;
           const instructors = course.instructors.map(instructor => {
-            const id = instructor._id;
+            const instructorId = instructor._id;
             const { firstname, lastname, email } = instructor;
-            return { id, firstname, lastname, email };
+            return { id: instructorId, firstname, lastname, email };
           });
+          return { id, name, description, instructors };
         })
       )
       .then(courses => res.send(courses))
