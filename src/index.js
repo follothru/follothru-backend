@@ -8,10 +8,10 @@ const {
   StudentApi,
   EventApi
 } = require('./apis');
-const { port, mongodbUrl, isProdEnabled, mongodbCloudUrl } = require('./configs/config.js');
+const { port, mongodbUrl, prod, mongodbCloudUrl } = require('./configs/config.js');
 const app = express();
 
-if (isProdEnabled) {
+if (prod) {
   mongoose.connect(mongodbCloudUrl, { useNewUrlParser: true });
 } else {
   mongoose.connect(mongodbUrl, { useNewUrlParser: true });
