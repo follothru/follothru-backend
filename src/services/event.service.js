@@ -13,9 +13,14 @@ module.exports = (() => {
       try {
         ValidationUtils.notNullOrEmpty(name);
         ValidationUtils.notNullOrEmpty(date);
+        const _id = new mongoose.Types.ObjectId();
+        date = new Date(date);
+        remindersToCreate = remindersToCreate.map(config => {
+          config.event = _id;
+          return config;
+        });
         ReminderService.createReminders(remindersToCreate)
           .then(newReminders => {
-            const _id = new mongoose.Types.ObjectId();
             const reminders = newReminders.map(newReminder => newReminder._id);
             const newEvent = new EventModel({ _id, name, date, reminders });
             return newEvent.save();

@@ -4,26 +4,27 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllReminders() {
-    return ReminderModel.find().then(reminders =>
-      reminders.map(reminder => {
-        const id = reminder._id;
-        const name = reminder.name;
-        return { id, name };
-      })
-    );
+    return ReminderModel.find().populate('event');
   }
 
   function createReminders(remindersToCreate) {
     return new Promise((resolve, reject) => {
-      const createPromises = remindersToCreate
-        .map(reminderConfig => {
-          const _id = new mongoose.Types.ObjectId();
-          const { name, date } = reminderConfig;
-          return new ReminderModel({ _id, name, date });
-        })
-        .map(reminderModels => reminderModels.save());
-      Promise.all(createPromises)
+      const createPromises = remindersToCreate.map(reminderConfig => {
+        try {
+          return createReminderWithConfig(reminderConfig);
+        } catch (err) {
+          console.error(
+            `Failed to create reminder with config "${reminderConfig}": `,
+            err
+          );
+        }
+      });
+      return Promise.all(createPromises)
+        .then(newReminders =>
+          newReminders.filter(reminder => reminder !== undefined)
+        )
         .then(newReminders => {
+          console.log(newReminders);
           resolve(newReminders);
         })
         .catch(reject);
@@ -43,6 +44,25 @@ module.exports = (() => {
         reject(err);
       }
     });
+  }
+
+  function createReminderWithConfig(config) {
+    ValidationUtils.notNull(config);
+    const _id = new mongoose.Types.ObjectId();
+    const { name, endDate, repeat, event } = config;
+    let { startDate } = config;
+    ValidationUtils.notNullOrEmpty(name);
+    ValidationUtils.notNullOrEmpty(startDate);
+    startDate = new Date(startDate);
+    const newReminder = new ReminderModel({
+      _id,
+      name,
+      startDate,
+      endDate,
+      repeat,
+      event
+    });
+    return newReminder.save();
   }
 
   return { findAllReminders, createReminder, createReminders };
