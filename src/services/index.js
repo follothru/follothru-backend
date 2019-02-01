@@ -3,11 +3,13 @@ const CourseService = require('./course.service.js');
 const UserService = require('./user.service.js');
 const StudentService = require('./student.service.js');
 const EventService = require('./event.service.js');
+const SubreminderService = require('./subreminder.service.js');
 
 module.exports = {
   ReminderService,
   CourseService,
   UserService,
   StudentService,
-  EventService
+  EventService,
+  SubreminderService
 };

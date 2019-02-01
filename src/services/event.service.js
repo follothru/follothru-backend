@@ -12,9 +12,9 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
-        ValidationUtils.notNullOrEmpty(date);
+        // ValidationUtils.notNullOrEmpty(date);
         const _id = new mongoose.Types.ObjectId();
-        date = new Date(date);
+        // date = new Date(date);
         remindersToCreate = remindersToCreate.map(config => {
           config.event = _id;
           return config;

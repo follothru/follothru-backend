@@ -11,8 +11,8 @@ module.exports = (() => {
           const { name, date } = event;
           const reminders = event.reminders.map(reminder => {
             const id = reminder._id;
-            const { name, startDate, endDate } = reminder;
-            return { id, name, startDate, endDate };
+            const { name, startDate, endDate, repeats } = reminder;
+            return { id, name, startDate, endDate, repeats };
           });
           return { id, name, date, reminders };
         })

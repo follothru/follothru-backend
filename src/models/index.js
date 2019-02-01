@@ -3,11 +3,13 @@ const CourseModel = require('./course.model.js');
 const ReminderModel = require('./reminder.model.js');
 const StudentModel = require('./student.model.js');
 const EventModel = require('./event.model.js');
+const SubreminderModel = require('./subreminder.model.js');
 
 module.exports = {
   UserModel,
   CourseModel,
   ReminderModel,
   StudentModel,
-  EventModel
+  EventModel,
+  SubreminderModel
 };

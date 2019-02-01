@@ -1,6 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const ReminderModel = require('../models/reminder.model.js');
+  const SubreminderService = require('../services/subreminder.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllReminders() {
@@ -24,7 +25,7 @@ module.exports = (() => {
           newReminders.filter(reminder => reminder !== undefined)
         )
         .then(newReminders => {
-          console.log(newReminders);
+          // console.log(newReminders);
           resolve(newReminders);
         })
         .catch(reject);
@@ -48,21 +49,21 @@ module.exports = (() => {
 
   function createReminderWithConfig(config) {
     ValidationUtils.notNull(config);
-    const _id = new mongoose.Types.ObjectId();
-    const { name, endDate, repeat, event } = config;
-    let { startDate } = config;
+    const { name, startDate, endDate, repeats, event } = config;
     ValidationUtils.notNullOrEmpty(name);
     ValidationUtils.notNullOrEmpty(startDate);
-    startDate = new Date(startDate);
-    const newReminder = new ReminderModel({
-      _id,
-      name,
-      startDate,
-      endDate,
-      repeat,
-      event
+    const _id = new mongoose.Types.ObjectId();
+    return SubreminderService.createSubreminders({ date: startDate, reminderId: _id }).then(subreminders => {
+      const newReminder = new ReminderModel({
+        _id,
+        name,
+        startDate,
+        endDate,
+        repeats,
+        event
+      });
+      return newReminder.save();
     });
-    return newReminder.save();
   }
 
   return { findAllReminders, createReminder, createReminders };
