@@ -6,7 +6,8 @@ const {
   CourseApi,
   UserApi,
   StudentApi,
-  EventApi
+  EventApi,
+  SubreminderApi
 } = require('./apis');
 const {
   port,
@@ -29,6 +30,7 @@ app.use('/course', CourseApi);
 app.use('/user', UserApi);
 app.use('/student', StudentApi);
 app.use('/event', EventApi);
+app.use('/subreminder', SubreminderApi);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
