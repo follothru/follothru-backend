@@ -1,13 +1,13 @@
 module.exports = (() => {
-    const mongoose = require('mongoose');
+  const mongoose = require('mongoose');
 
-    const SubreminderSchema = mongoose.Schema({
-        date: Date,
-        parentReminder: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'ReminderModel'
-        }
-    });
+  const SubreminderSchema = mongoose.Schema({
+    date: Date,
+    parentReminder: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ReminderModel'
+    }
+  });
 
-    return mongoose.model('SubreminderModel', SubreminderSchema);
+  return mongoose.model('SubreminderModel', SubreminderSchema);
 })();

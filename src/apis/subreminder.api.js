@@ -1,19 +1,21 @@
 module.exports = (() => {
-    const express = require('express');
-    const { SubreminderService } = require('../services');
-    const router = express.Router();
+  const express = require('express');
+  const { SubreminderService } = require('../services');
+  const router = express.Router();
 
-    router.get('/', (req, res) => {
-        SubreminderService.findAllSubreminders().then((subreminders) => {
-            res.send(subreminders);
-        }).catch();
-    });
+  router.get('/', (req, res) => {
+    SubreminderService.findAllSubreminders()
+      .then(subreminders => {
+        res.send(subreminders);
+      })
+      .catch();
+  });
 
-    router.post('/', (req, res) => {
-        SubreminderService.createSubreminders(req.body).then(() => {
-            
-        }).catch();
-    });
+  router.post('/', (req, res) => {
+    SubreminderService.createSubreminders(req.body)
+      .then(() => {})
+      .catch();
+  });
 
-    return router;
+  return router;
 })();

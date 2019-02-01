@@ -5,4 +5,11 @@ const StudentApi = require('./student.api.js');
 const EventApi = require('./event.api.js');
 const SubreminderApi = require('./subreminder.api.js');
 
-module.exports = { ReminderApi, CourseApi, UserApi, StudentApi, EventApi, SubreminderApi };
+module.exports = {
+  ReminderApi,
+  CourseApi,
+  UserApi,
+  StudentApi,
+  EventApi,
+  SubreminderApi
+};

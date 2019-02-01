@@ -53,7 +53,10 @@ module.exports = (() => {
     ValidationUtils.notNullOrEmpty(name);
     ValidationUtils.notNullOrEmpty(startDate);
     const _id = new mongoose.Types.ObjectId();
-    return SubreminderService.createSubreminders({ date: startDate, reminderId: _id }).then(subreminders => {
+    return SubreminderService.createSubreminders({
+      date: startDate,
+      reminderId: _id
+    }).then(subreminders => {
       const newReminder = new ReminderModel({
         _id,
         name,
