@@ -1,7 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const SubreminderModel = require('../models/subreminder.model.js');
-  const ValidationUtils = require('../utils/validation.util.js');
+  // const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllSubreminders() {
     return SubreminderModel.find().populate('reminders');
@@ -45,7 +45,9 @@ module.exports = (() => {
           index => new Date(startDate.getTime() + index * ONEDAYINMILL * 7)
         );
       } else if (repeat.match(regexes.monthly)) {
+        return [];
       } else if (repeat.match(regexes.everyXDays)) {
+        return [];
       }
     });
     console.log(occurrence);

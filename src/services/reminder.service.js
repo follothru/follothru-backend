@@ -56,7 +56,7 @@ module.exports = (() => {
     return SubreminderService.createSubreminders({
       date: startDate,
       reminderId: _id
-    }).then(subreminders => {
+    }).then(() => {
       const newReminder = new ReminderModel({
         _id,
         name,

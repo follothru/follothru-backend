@@ -13,7 +13,9 @@ module.exports = (() => {
 
   router.post('/', (req, res) => {
     SubreminderService.createSubreminders(req.body)
-      .then(() => {})
+      .then(() => {
+        res.send();
+      })
       .catch();
   });
 
