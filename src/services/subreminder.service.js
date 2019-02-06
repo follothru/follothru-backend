@@ -25,8 +25,8 @@ module.exports = (() => {
   }
 
   function getOccurrence(startDate, endDate, repeats) {
-    startDate = new Date(startDate - 0);
-    endDate = new Date(endDate - 0);
+    const startDateSplit = startDate.split('-');
+    const endDateSplit = endDate.split('-');
     const regexes = {
       daily: /DAILY/,
       weekly: /WEEKLY/,
@@ -36,26 +36,38 @@ module.exports = (() => {
     const occurrence = repeats.map(repeat => {
       if (repeat.match(regexes.daily)) {
         const start = new MyDate({
-          dateObject: startDate
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
         });
         const end = new MyDate({
-          dateObject: endDate
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
         });
         return start.countDaily(end);
       } else if (repeat.match(regexes.weekly)) {
         const start = new MyDate({
-          dateObject: startDate
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
         });
         const end = new MyDate({
-          dateObject: endDate
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
         });
         return start.countWeekly(end);
       } else if (repeat.match(regexes.monthly)) {
         const start = new MyDate({
-          dateObject: startDate
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
         });
         const end = new MyDate({
-          dateObject: endDate
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
         });
         return start.countMonthly(end);
       } else if (repeat.match(regexes.everyXDays)) {
