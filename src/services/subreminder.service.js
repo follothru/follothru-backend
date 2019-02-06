@@ -1,6 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const SubreminderModel = require('../models/subreminder.model.js');
+  const { MyDate } = require('../classes/index.js');
   // const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllSubreminders() {
@@ -33,28 +34,36 @@ module.exports = (() => {
       everyXDays: /EVERY ([1-9][0-9]*) DAY/
     };
     const occurrence = repeats.map(repeat => {
-      const ONEDAYINMILL = 1000 * 24 * 3600;
       if (repeat.match(regexes.daily)) {
-        const numOfDays = calNumOfDays(startDate, endDate, ONEDAYINMILL);
-        return [...new Array(numOfDays).keys()].map(
-          index => new Date(startDate.getTime() + index * ONEDAYINMILL)
-        );
+        const start = new MyDate({
+          dateObject: startDate
+        });
+        const end = new MyDate({
+          dateObject: endDate
+        });
+        return start.countDaily(end);
       } else if (repeat.match(regexes.weekly)) {
-        const numOfDays = calNumOfDays(startDate, endDate, ONEDAYINMILL * 7);
-        return [...new Array(numOfDays).keys()].map(
-          index => new Date(startDate.getTime() + index * ONEDAYINMILL * 7)
-        );
+        const start = new MyDate({
+          dateObject: startDate
+        });
+        const end = new MyDate({
+          dateObject: endDate
+        });
+        return start.countWeekly(end);
       } else if (repeat.match(regexes.monthly)) {
-        return [];
+        const start = new MyDate({
+          dateObject: startDate
+        });
+        const end = new MyDate({
+          dateObject: endDate
+        });
+        return start.countMonthly(end);
       } else if (repeat.match(regexes.everyXDays)) {
         return [];
       }
     });
-    console.log(occurrence);
-  }
 
-  function calNumOfDays(startDate, endDate, divider) {
-    return Math.ceil((endDate - startDate) / divider);
+    return occurrence;
   }
 
   return {
