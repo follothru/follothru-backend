@@ -1,6 +1,9 @@
 /**
  * _dateObject is js native Data object
  */
+
+const { Exception, MyDateMessageKey } = require('./error/index.js');
+
 class MyDate {
   constructor(config) {
     this._ONEDAYINMILLS = 24 * 60 * 60 * 1000;
@@ -9,15 +12,7 @@ class MyDate {
   }
 
   initDateObject(config) {
-    if (config.dateObject !== null && config.dateObject !== undefined) {
-      this._dateObject = config.dateObject;
-      this._year = this.getDateObjectYear();
-      this._month = this.getDateObjectMonth() + 1;
-      this._date = this.getDateObjectDate();
-    } else if (
-      config.milliseconds !== null &&
-      config.milliseconds !== undefined
-    ) {
+    if (config.milliseconds !== null && config.milliseconds !== undefined) {
       this._dateObject = this.initDateObjectByMilliseconds(config.milliseconds);
       this._year = this.getDateObjectYear();
       this._month = this.getDateObjectMonth() + 1;
@@ -42,19 +37,17 @@ class MyDate {
         config.month == 2 &&
         config.date > 28
       ) {
-        throw new Error('leap year exception');
+        throw new Exception(MyDateMessageKey.LEAPYEAREXCEPTION);
       } else if (
         this.isLeapYear(config.year) &&
         config.month == 2 &&
         config.date > 29
       ) {
-        throw new Error('date out of bound');
+        throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
       } else {
         this._isDatePossible = true;
-        let date = new Date(config.year, config.month, config.date);
-        // month-1 to get accurate dateobject
-        date.setMonth(date.getMonth() - 1);
-        return date;
+        const d = config.year + '/' + config.month + '/' + config.date;
+        return new Date(d);
       }
     } catch (err) {
       return null;
@@ -66,7 +59,11 @@ class MyDate {
   }
 
   getDateObjectYear() {
-    return this._dateObject.getFullYear();
+    try {
+      return this._dateObject.getFullYear();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getIsDatePossible() {
@@ -78,7 +75,11 @@ class MyDate {
   }
 
   getDateObjectMonth() {
-    return this._dateObject.getMonth();
+    try {
+      return this._dateObject.getMonth();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getDate() {
@@ -86,28 +87,52 @@ class MyDate {
   }
 
   getDateObjectDate() {
-    return this._dateObject.getDate();
+    try {
+      return this._dateObject.getDate();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getHours() {
-    return this._dateObject.getHours();
+    try {
+      return this._dateObject.getHours();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getMinutes() {
-    return this._dateObject.getMinutes();
+    try {
+      return this._dateObject.getMinutes();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getSeconds() {
-    return this._dateObject.getSeconds();
+    try {
+      return this._dateObject.getSeconds();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   // gets millisecond representation of time object
   getTime() {
-    return this._dateObject.getTime();
+    try {
+      return this._dateObject.getTime();
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   getDateObject() {
-    return this._dateObject;
+    try {
+      return this._dateObject;
+    } catch (err) {
+      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+    }
   }
 
   toString() {
@@ -129,7 +154,7 @@ class MyDate {
   // repeats the event every daily at same time
   countDaily(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Error('date out of range');
+      throw new Exception('date out of range');
     }
     const numOfDays = Math.ceil(
       (endDate.getTime() - this.getTime()) / this._ONEDAYINMILLS
@@ -145,7 +170,7 @@ class MyDate {
   // repeats the event every week at same time
   countWeekly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Error('date out of range');
+      throw new Exception('date out of range');
     }
     const numOfWeeks = Math.ceil(
       (endDate.getTime() - this.getTime()) / (this._ONEDAYINMILLS * 7)
@@ -163,7 +188,7 @@ class MyDate {
   // repeats the event monthly on specific date at same time
   countMonthly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Error('date out of range');
+      throw new Exception('date out of range');
     }
 
     const numOfMonths =
