@@ -154,7 +154,7 @@ class MyDate {
   // repeats the event every daily at same time
   countDaily(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception('date out of range');
+      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
     }
     const numOfDays = Math.ceil(
       (endDate.getTime() - this.getTime()) / this._ONEDAYINMILLS
@@ -170,7 +170,7 @@ class MyDate {
   // repeats the event every week at same time
   countWeekly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception('date out of range');
+      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
     }
     const numOfWeeks = Math.ceil(
       (endDate.getTime() - this.getTime()) / (this._ONEDAYINMILLS * 7)
@@ -188,7 +188,7 @@ class MyDate {
   // repeats the event monthly on specific date at same time
   countMonthly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception('date out of range');
+      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
     }
 
     const numOfMonths =
