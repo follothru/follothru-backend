@@ -2,7 +2,7 @@
  * _dateObject is js native Data object
  */
 
-const { Exception, MyDateMessageKey } = require('./error/index.js');
+const { Exception, MyDateMessageKey } = require('./index.js');
 
 class MyDate {
   constructor(config) {
@@ -37,13 +37,13 @@ class MyDate {
         config.month == 2 &&
         config.date > 28
       ) {
-        throw new Exception(MyDateMessageKey.LEAPYEAREXCEPTION);
+        throw new Exception(MyDateMessageKey.LEAP_YEAR_EXCEPTION);
       } else if (
         this.isLeapYear(config.year) &&
         config.month == 2 &&
         config.date > 29
       ) {
-        throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
+        throw new Exception(MyDateMessageKey.DATE_RANGE_EXCEPTION);
       } else {
         this._isDatePossible = true;
         const d = config.year + '/' + config.month + '/' + config.date;
@@ -62,7 +62,7 @@ class MyDate {
     try {
       return this._dateObject.getFullYear();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -78,7 +78,7 @@ class MyDate {
     try {
       return this._dateObject.getMonth();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -90,7 +90,7 @@ class MyDate {
     try {
       return this._dateObject.getDate();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -98,7 +98,7 @@ class MyDate {
     try {
       return this._dateObject.getHours();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -106,7 +106,7 @@ class MyDate {
     try {
       return this._dateObject.getMinutes();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -114,7 +114,7 @@ class MyDate {
     try {
       return this._dateObject.getSeconds();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -123,7 +123,7 @@ class MyDate {
     try {
       return this._dateObject.getTime();
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -131,7 +131,7 @@ class MyDate {
     try {
       return this._dateObject;
     } catch (err) {
-      return new Exception(MyDateMessageKey.DATEOBJECTEXCEPTION);
+      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
     }
   }
 
@@ -154,7 +154,7 @@ class MyDate {
   // repeats the event every daily at same time
   countDaily(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
+      throw new Exception(MyDateMessageKey.DATE_RANGE_EXCEPTION);
     }
     const numOfDays = Math.ceil(
       (endDate.getTime() - this.getTime()) / this._ONEDAYINMILLS
@@ -170,7 +170,7 @@ class MyDate {
   // repeats the event every week at same time
   countWeekly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
+      throw new Exception(MyDateMessageKey.DATE_RANGE_EXCEPTION);
     }
     const numOfWeeks = Math.ceil(
       (endDate.getTime() - this.getTime()) / (this._ONEDAYINMILLS * 7)
@@ -188,7 +188,7 @@ class MyDate {
   // repeats the event monthly on specific date at same time
   countMonthly(endDate) {
     if (this.getTime() > endDate.getTime()) {
-      throw new Exception(MyDateMessageKey.DATERANGEEXCEPTION);
+      throw new Exception(MyDateMessageKey.DATE_RANGE_EXCEPTION);
     }
 
     const numOfMonths =

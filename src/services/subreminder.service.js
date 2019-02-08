@@ -1,7 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const SubreminderModel = require('../models/subreminder.model.js');
-  const { MyDate } = require('../classes/index.js');
+  const { MyDate } = require('../utils/index.js');
   // const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllSubreminders() {
