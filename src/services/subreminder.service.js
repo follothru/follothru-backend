@@ -1,6 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const SubreminderModel = require('../models/subreminder.model.js');
+  const { MyDate } = require('../utils/index.js');
   // const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllSubreminders() {
@@ -24,8 +25,8 @@ module.exports = (() => {
   }
 
   function getOccurrence(startDate, endDate, repeats) {
-    startDate = new Date(startDate - 0);
-    endDate = new Date(endDate - 0);
+    const startDateSplit = startDate.split('-');
+    const endDateSplit = endDate.split('-');
     const regexes = {
       daily: /DAILY/,
       weekly: /WEEKLY/,
@@ -33,28 +34,48 @@ module.exports = (() => {
       everyXDays: /EVERY ([1-9][0-9]*) DAY/
     };
     const occurrence = repeats.map(repeat => {
-      const ONEDAYINMILL = 1000 * 24 * 3600;
       if (repeat.match(regexes.daily)) {
-        const numOfDays = calNumOfDays(startDate, endDate, ONEDAYINMILL);
-        return [...new Array(numOfDays).keys()].map(
-          index => new Date(startDate.getTime() + index * ONEDAYINMILL)
-        );
+        const start = new MyDate({
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
+        });
+        const end = new MyDate({
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
+        });
+        return start.countDaily(end);
       } else if (repeat.match(regexes.weekly)) {
-        const numOfDays = calNumOfDays(startDate, endDate, ONEDAYINMILL * 7);
-        return [...new Array(numOfDays).keys()].map(
-          index => new Date(startDate.getTime() + index * ONEDAYINMILL * 7)
-        );
+        const start = new MyDate({
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
+        });
+        const end = new MyDate({
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
+        });
+        return start.countWeekly(end);
       } else if (repeat.match(regexes.monthly)) {
-        return [];
+        const start = new MyDate({
+          year: startDateSplit[0],
+          month: startDateSplit[1],
+          date: startDateSplit[2]
+        });
+        const end = new MyDate({
+          year: endDateSplit[0],
+          month: endDateSplit[1],
+          date: endDateSplit[2]
+        });
+        return start.countMonthly(end);
       } else if (repeat.match(regexes.everyXDays)) {
         return [];
       }
     });
-    console.log(occurrence);
-  }
 
-  function calNumOfDays(startDate, endDate, divider) {
-    return Math.ceil((endDate - startDate) / divider);
+    return occurrence;
   }
 
   return {
