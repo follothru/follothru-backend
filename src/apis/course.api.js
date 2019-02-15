@@ -36,8 +36,14 @@ module.exports = (() => {
       .then(courses => {
         courses = courses.map(course => {
           const id = course._id;
-          const { instructors, students, name, description } = course;
-          return { id, instructors, name, description, students };
+          const {
+            instructors,
+            students,
+            name,
+            description,
+            reminders
+          } = course;
+          return { id, instructors, name, description, students, reminders };
         });
         res.send(courses[0]);
       })

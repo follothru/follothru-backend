@@ -10,7 +10,9 @@ module.exports = (() => {
   }
 
   function findCourseById(id) {
-    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) });
+    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) }).populate(
+      'reminders'
+    );
   }
 
   function createCourse(name, description, instructorIds, reminderIds) {
