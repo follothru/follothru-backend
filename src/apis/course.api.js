@@ -5,8 +5,8 @@ module.exports = (() => {
 
   router.get('/', (req, res) => {
     CourseService.findAllCourses()
-      .then(courses =>
-        courses.map(course => {
+      .then(courses => {
+        courses = courses.map(course => {
           const id = course._id;
           const name = course.name;
           const description = course.description;
@@ -15,10 +15,15 @@ module.exports = (() => {
             const { firstname, lastname, email } = instructor;
             return { id: instructorId, firstname, lastname, email };
           });
-          return { id, name, description, instructors };
-        })
-      )
-      .then(courses => res.send(courses))
+          const reminders = course.reminders.map(reminder => {
+            const reminderId = reminder._id;
+            const { name, startDate, endDate, event } = reminder;
+            return { id: reminderId, name, startDate, endDate, event };
+          });
+          return { id, name, description, instructors, reminders };
+        });
+        res.send(courses);
+      })
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
@@ -31,8 +36,14 @@ module.exports = (() => {
       .then(courses => {
         courses = courses.map(course => {
           const id = course._id;
-          const { instructors, students, name, description } = course;
-          return { id, instructors, name, description, students };
+          const {
+            instructors,
+            students,
+            name,
+            description,
+            reminders
+          } = course;
+          return { id, instructors, name, description, students, reminders };
         });
         res.send(courses[0]);
       })
@@ -43,8 +54,8 @@ module.exports = (() => {
   });
 
   router.post('/', (req, res) => {
-    const { name, description, instructors } = req.body;
-    CourseService.createCourse(name, description, instructors)
+    const { name, description, instructors, reminders } = req.body;
+    CourseService.createCourse(name, description, instructors, reminders)
       .then(result => {
         res.send({ id: result._id });
       })

@@ -4,19 +4,26 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
-    return CourseModel.find().populate('instructors');
+    return CourseModel.find()
+      .populate('instructors')
+      .populate('reminders');
   }
 
   function findCourseById(id) {
-    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) });
+    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) }).populate(
+      'reminders'
+    );
   }
 
-  function createCourse(name, description, instructorIds) {
+  function createCourse(name, description, instructorIds, reminderIds) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
         const instructors = instructorIds
           ? instructorIds.map(id => new mongoose.Types.ObjectId(id))
+          : [];
+        const reminders = reminderIds
+          ? reminderIds.map(id => new mongoose.Types.ObjectId(id))
           : [];
         const _id = new mongoose.Types.ObjectId();
         const active = false;
@@ -25,7 +32,8 @@ module.exports = (() => {
           name,
           description,
           active,
-          instructors
+          instructors,
+          reminders
         });
         newCourse
           .save()
