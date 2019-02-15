@@ -30,9 +30,9 @@ module.exports = (() => {
     CourseService.findCourseById(id)
       .then(courses => {
         courses = courses.map(course => {
-          const courseId = course._id;
+          const id = course._id;
           const { instructors, students, name, description } = course;
-          return { courseId, instructors, name, description, students };
+          return { id, instructors, name, description, students };
         });
         res.send(courses[0]);
       })
