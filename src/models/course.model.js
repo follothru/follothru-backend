@@ -8,7 +8,8 @@ module.exports = (() => {
     endDate: Date,
     active: Boolean,
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' }],
-    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StudentModel' }]
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StudentModel' }],
+    reminders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ReminderModel' }]
   });
 
   return mongoose.model('CourseModel', CourseSchema);
