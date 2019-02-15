@@ -7,6 +7,10 @@ module.exports = (() => {
     return CourseModel.find().populate('instructors');
   }
 
+  function findCourseById(id) {
+    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) });
+  }
+
   function createCourse(name, description, instructorIds) {
     return new Promise((resolve, reject) => {
       try {
@@ -33,5 +37,5 @@ module.exports = (() => {
     });
   }
 
-  return { findAllCourses, createCourse };
+  return { findAllCourses, createCourse, findCourseById };
 })();

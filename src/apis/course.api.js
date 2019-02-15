@@ -25,6 +25,23 @@ module.exports = (() => {
       });
   });
 
+  router.get('/:id', (req, res) => {
+    const id = req.params.id;
+    CourseService.findCourseById(id)
+      .then(courses => {
+        courses = courses.map(course => {
+          const id = course._id;
+          const { instructors, students, name, description } = course;
+          return { id, instructors, name, description, students };
+        });
+        res.send(courses[0]);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send(err);
+      });
+  });
+
   router.post('/', (req, res) => {
     const { name, description, instructors } = req.body;
     CourseService.createCourse(name, description, instructors)
