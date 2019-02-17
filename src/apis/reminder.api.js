@@ -4,37 +4,27 @@ module.exports = (() => {
   const router = express.Router();
 
   router.get('/', (req, res) => {
-    const { courseId } = req.query;
-    if (courseId === undefined) {
-      ReminderService.findAllReminders()
-        .then(reminders =>
-          reminders.map(reminder => {
-            const id = reminder._id;
-            const { name, startDate, endDate } = reminder;
-            let event = null;
-            if (reminder.event) {
-              event = {
-                id: reminder.event._id,
-                name: reminder.event.name,
-                date: reminder.event.date
-              };
-            }
-            return { id, name, startDate, endDate, event };
-          })
-        )
-        .then(reminders => res.send(reminders))
-        .catch(err => {
-          console.error(err);
-          res.status(500).send(err);
-        });
-    } else {
-      ReminderService.findRemindersByCourseId(courseId)
-        .then(reminders => res.send(reminders))
-        .catch(err => {
-          console.error(err);
-          res.status(500).send(err);
-        });
-    }
+    ReminderService.findAllReminders()
+      .then(reminders =>
+        reminders.map(reminder => {
+          const id = reminder._id;
+          const { name, startDate, endDate } = reminder;
+          let event = null;
+          if (reminder.event) {
+            event = {
+              id: reminder.event._id,
+              name: reminder.event.name,
+              date: reminder.event.date
+            };
+          }
+          return { id, name, startDate, endDate, event };
+        })
+      )
+      .then(reminders => res.send(reminders))
+      .catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+      });
   });
 
   router.post('/', (req, res) => {

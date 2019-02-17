@@ -1,6 +1,6 @@
 module.exports = (() => {
   const express = require('express');
-  const { CourseService } = require('../services');
+  const { CourseService, ReminderService } = require('../services');
   const router = express.Router();
 
   router.get('/', (req, res) => {
@@ -34,6 +34,16 @@ module.exports = (() => {
       })
       .catch(err => {
         console.log(err);
+        res.status(500).send(err);
+      });
+  });
+
+  router.get('/:courseId/reminder', (req, res) => {
+    const { courseId } = req.params;
+    ReminderService.findRemindersByCourseId(courseId)
+      .then(reminders => res.send(reminders))
+      .catch(err => {
+        console.error(err);
         res.status(500).send(err);
       });
   });
