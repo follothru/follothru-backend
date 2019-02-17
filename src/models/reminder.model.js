@@ -16,6 +16,7 @@ module.exports = (() => {
     startDate: Date,
     endDate: Date,
     event: { type: mongoose.Schema.Types.ObjectId, ref: 'EventModel' },
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
     repeats: [String],
     alerts: []
   });

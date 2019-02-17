@@ -24,7 +24,14 @@ if (prod) {
 }
 
 app.use(bodyParser.json());
-
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 app.use('/reminder', ReminderApi);
 app.use('/course', CourseApi);
 app.use('/user', UserApi);
@@ -32,6 +39,9 @@ app.use('/student', StudentApi);
 app.use('/event', EventApi);
 app.use('/subreminder', SubreminderApi);
 
+/**
+ * For development purposes
+ */
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, OPTIONS');
