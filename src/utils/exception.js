@@ -1,9 +1,7 @@
 class Exception {
-  constructor(msg) {
-    this._msg = msg;
-  }
-  toString() {
-    return this._msg;
+  constructor(messageKey) {
+    this.label = messageKey._label;
+    this.message = messageKey._msg;
   }
 }
 

@@ -1,4 +1,10 @@
 module.exports = (() => {
+  const {
+    MyDateMessageKey,
+    MessageKey,
+    ValidationUtil,
+    Exception
+  } = require('../utils');
   const express = require('express');
   const { ReminderService, SessionService } = require('../services');
 
@@ -9,7 +15,7 @@ module.exports = (() => {
       .then(reminders =>
         reminders.map(reminder => {
           const id = reminder._id;
-          const { name, startDate, endDate } = reminder;
+          const { name, startDate, endDate, course } = reminder;
           let event = null;
           if (reminder.event) {
             event = {
@@ -18,7 +24,7 @@ module.exports = (() => {
               date: reminder.event.date
             };
           }
-          return { id, name, startDate, endDate, event };
+          return { id, name, startDate, endDate, event, course };
         })
       )
       .then(reminders => res.send(reminders))
