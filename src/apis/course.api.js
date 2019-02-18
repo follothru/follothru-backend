@@ -1,6 +1,6 @@
 module.exports = (() => {
   const express = require('express');
-  const { CourseService } = require('../services');
+  const { CourseService, ReminderService } = require('../services');
   const router = express.Router();
 
   router.get('/', (req, res) => {
@@ -15,12 +15,7 @@ module.exports = (() => {
             const { firstname, lastname, email } = instructor;
             return { id: instructorId, firstname, lastname, email };
           });
-          const reminders = course.reminders.map(reminder => {
-            const reminderId = reminder._id;
-            const { name, startDate, endDate, event } = reminder;
-            return { id: reminderId, name, startDate, endDate, event };
-          });
-          return { id, name, description, instructors, reminders };
+          return { id, name, description, instructors };
         });
         res.send(courses);
       })
@@ -33,19 +28,9 @@ module.exports = (() => {
   router.get('/:id', (req, res) => {
     const id = req.params.id;
     CourseService.findCourseById(id)
-      .then(courses => {
-        courses = courses.map(course => {
-          const id = course._id;
-          const {
-            instructors,
-            students,
-            name,
-            description,
-            reminders
-          } = course;
-          return { id, instructors, name, description, students, reminders };
-        });
-        res.send(courses[0]);
+      .then(course => {
+        const { instructors, name, description } = course;
+        res.send({ id, name, description, instructors });
       })
       .catch(err => {
         console.log(err);
@@ -53,9 +38,19 @@ module.exports = (() => {
       });
   });
 
+  router.get('/:courseId/reminder', (req, res) => {
+    const { courseId } = req.params;
+    ReminderService.findRemindersByCourseId(courseId)
+      .then(reminders => res.send(reminders))
+      .catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  });
+
   router.post('/', (req, res) => {
-    const { name, description, instructors, reminders } = req.body;
-    CourseService.createCourse(name, description, instructors, reminders)
+    const { name, description, instructors } = req.body;
+    CourseService.createCourse(name, description, instructors)
       .then(result => {
         res.send({ id: result._id });
       })

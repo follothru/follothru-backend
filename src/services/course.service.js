@@ -10,20 +10,17 @@ module.exports = (() => {
   }
 
   function findCourseById(id) {
-    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) }).populate(
-      'reminders'
+    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) }).then(
+      courses => courses[0]
     );
   }
 
-  function createCourse(name, description, instructorIds, reminderIds) {
+  function createCourse(name, description, instructorIds) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
         const instructors = instructorIds
           ? instructorIds.map(id => new mongoose.Types.ObjectId(id))
-          : [];
-        const reminders = reminderIds
-          ? reminderIds.map(id => new mongoose.Types.ObjectId(id))
           : [];
         const _id = new mongoose.Types.ObjectId();
         const active = false;
@@ -32,8 +29,7 @@ module.exports = (() => {
           name,
           description,
           active,
-          instructors,
-          reminders
+          instructors
         });
         newCourse
           .save()

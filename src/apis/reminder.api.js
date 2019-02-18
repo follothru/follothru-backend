@@ -28,10 +28,15 @@ module.exports = (() => {
   });
 
   router.post('/', (req, res) => {
-    const { name } = req.body;
-    ReminderService.createReminder(name)
+    const { name, courseId } = req.body;
+    ReminderService.createReminder(name, courseId)
       .then(result => {
-        res.send(result);
+        const id = result._id;
+        const { name } = result;
+        res.send({
+          id,
+          name
+        });
       })
       .catch(err => {
         console.error(err);
