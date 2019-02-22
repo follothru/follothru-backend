@@ -64,5 +64,24 @@ module.exports = (() => {
     });
   }
 
-  return { findAllUsers, createUser, findUsersByIds, Errors };
+  function validateUser(username, password) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(username, 'username');
+        ValidationUtils.notNullOrEmpty(password, 'password');
+        findUserByEmail(username).then(foundUsr => {
+          if (foundUsr !== null && foundUsr.password !== password) {
+            const error = `Failed to validate user with username ${username}`;
+            reject({ error });
+            return;
+          }
+          resolve(foundUsr);
+        });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  return { findAllUsers, createUser, findUsersByIds, validateUser, Errors };
 })();

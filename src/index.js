@@ -5,6 +5,7 @@ const {
   ReminderApi,
   CourseApi,
   UserApi,
+  SessionApi,
   StudentApi,
   EventApi,
   SubreminderApi
@@ -35,6 +36,7 @@ app.use(function(req, res, next) {
 app.use('/reminder', ReminderApi);
 app.use('/course', CourseApi);
 app.use('/user', UserApi);
+app.use('/session', SessionApi);
 app.use('/student', StudentApi);
 app.use('/event', EventApi);
 app.use('/subreminder', SubreminderApi);
@@ -44,9 +46,16 @@ app.use('/subreminder', SubreminderApi);
  */
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  next();
+  res.setHeader('Access-Control-Allow-Methods', 'PUT,POST,GET,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, Content-Length, X-Requested-With'
+  );
+  if (req.method === 'OPTIONS') {
+    res.send(200);
+  } else {
+    next();
+  }
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
