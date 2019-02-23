@@ -6,7 +6,7 @@ module.exports = (() => {
     name: String,
     description: String,
     endDate: Date,
-    active: Boolean,
+    approved: Boolean,
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StudentModel' }]
   });

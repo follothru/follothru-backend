@@ -1,9 +1,12 @@
 module.exports = (() => {
   const express = require('express');
   const { ReminderService } = require('../services');
+  const { AuthenticationUtils } = require('../utils');
+  const { authenticateSession } = AuthenticationUtils;
+
   const router = express.Router();
 
-  router.get('/', (req, res) => {
+  router.get('/', authenticateSession, (req, res) => {
     ReminderService.findAllReminders()
       .then(reminders =>
         reminders.map(reminder => {
@@ -27,7 +30,7 @@ module.exports = (() => {
       });
   });
 
-  router.post('/', (req, res) => {
+  router.post('/', authenticateSession, (req, res) => {
     const { name, courseId } = req.body;
     ReminderService.createReminder(name, courseId)
       .then(result => {
@@ -41,6 +44,21 @@ module.exports = (() => {
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
+      });
+  });
+
+  router.delete('/:reminderId', authenticateSession, (req, res) => {
+    const { reminderId } = req.params;
+    ReminderService.deleteReminder(reminderId)
+      .then(result => {
+        if (result.n <= 0) {
+          throw new Error('Failed to delete reminder.');
+        }
+        res.send({});
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(400).send(err);
       });
   });
 

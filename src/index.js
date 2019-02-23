@@ -25,11 +25,16 @@ if (prod) {
 }
 
 app.use(bodyParser.json());
+
+/**
+ * For development purposes only
+ */
 app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
   next();
 });
@@ -40,22 +45,5 @@ app.use('/session', SessionApi);
 app.use('/student', StudentApi);
 app.use('/event', EventApi);
 app.use('/subreminder', SubreminderApi);
-
-/**
- * For development purposes
- */
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'PUT,POST,GET,OPTIONS');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, Content-Length, X-Requested-With'
-  );
-  if (req.method === 'OPTIONS') {
-    res.send(200);
-  } else {
-    next();
-  }
-});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

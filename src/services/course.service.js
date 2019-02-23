@@ -4,31 +4,27 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
-    return CourseModel.find()
-      .populate('instructors')
-      .populate('reminders');
+    return CourseModel.find().populate('instructors');
   }
 
   function findCourseById(id) {
-    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) }).then(
-      courses => courses[0]
-    );
+    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) })
+      .populate('instructors')
+      .then(courses => courses[0]);
   }
 
-  function createCourse(name, description, instructorIds) {
+  function createCourse(name, description, endDate, instructors) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
-        const instructors = instructorIds
-          ? instructorIds.map(id => new mongoose.Types.ObjectId(id))
-          : [];
         const _id = new mongoose.Types.ObjectId();
-        const active = false;
+        const approved = false;
         const newCourse = new CourseModel({
           _id,
           name,
           description,
-          active,
+          endDate,
+          approved,
           instructors
         });
         newCourse
@@ -53,8 +49,35 @@ module.exports = (() => {
         course.endDate = endDate;
       }
       course.save();
+      return course;
     });
   }
 
-  return { findAllCourses, createCourse, findCourseById, modifyCourse };
+  function deleteCourse(courseId) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        CourseModel.deleteOne({ _id: courseId })
+          .then(result => {
+            if (result.n <= 0) {
+              const error = `Failed to delete course: no course found with id ${courseId}`;
+              throw new Error(error);
+            }
+            resolve(result);
+            return result;
+          })
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  return {
+    findAllCourses,
+    createCourse,
+    findCourseById,
+    modifyCourse,
+    deleteCourse
+  };
 })();

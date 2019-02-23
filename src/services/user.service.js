@@ -70,9 +70,8 @@ module.exports = (() => {
         ValidationUtils.notNullOrEmpty(username, 'username');
         ValidationUtils.notNullOrEmpty(password, 'password');
         findUserByEmail(username).then(foundUsr => {
-          if (foundUsr !== null && foundUsr.password !== password) {
-            const error = `Failed to validate user with username ${username}`;
-            reject({ error });
+          if (foundUsr === null || foundUsr.password !== password) {
+            reject(new Error('Incorrect username or password.'));
             return;
           }
           resolve(foundUsr);

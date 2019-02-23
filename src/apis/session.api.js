@@ -58,7 +58,8 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        const { message } = err;
+        res.status(400).send({ message });
       });
   });
 
