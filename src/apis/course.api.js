@@ -29,11 +29,25 @@ module.exports = (() => {
     const id = req.params.id;
     CourseService.findCourseById(id)
       .then(course => {
+        if (!course) {
+          throw 'Could not find course';
+        }
         const { instructors, name, description } = course;
         res.send({ id, name, description, instructors });
       })
       .catch(err => {
-        console.log(err);
+        console.error(err);
+        res.status(500).send(err);
+      });
+  });
+
+  router.put('/:id', (req, res) => {
+    const id = req.params.id;
+    const { name, description, endDate } = req.body;
+    CourseService.modifyCourse(id, name, description, endDate)
+      .then(() => res.send({ id }))
+      .catch(err => {
+        console.error(err);
         res.status(500).send(err);
       });
   });

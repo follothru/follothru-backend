@@ -41,5 +41,20 @@ module.exports = (() => {
     });
   }
 
-  return { findAllCourses, createCourse, findCourseById };
+  function modifyCourse(courseId, name, description, endDate) {
+    return findCourseById(courseId).then(course => {
+      if (name) {
+        course.name = name;
+      }
+      if (description) {
+        course.description = description;
+      }
+      if (endDate) {
+        course.endDate = endDate;
+      }
+      course.save();
+    });
+  }
+
+  return { findAllCourses, createCourse, findCourseById, modifyCourse };
 })();
