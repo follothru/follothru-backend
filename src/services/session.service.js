@@ -47,5 +47,15 @@ module.exports = (() => {
     });
   }
 
-  return { createUserSession, validateUserSession };
+  function authenticateSession(req, res, next) {
+    const { authorization } = req.headers;
+    validateUserSession(authorization)
+      .then(result => {
+        req.currentUser = result.user;
+        next();
+      })
+      .catch(() => res.status(403).send());
+  }
+
+  return { createUserSession, validateUserSession, authenticateSession };
 })();

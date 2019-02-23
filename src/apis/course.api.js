@@ -1,10 +1,13 @@
 module.exports = (() => {
   const express = require('express');
-  const { CourseService, ReminderService } = require('../services');
-  const { AuthenticationUtils } = require('../utils');
+  const {
+    CourseService,
+    ReminderService,
+    SessionService
+  } = require('../services');
   const router = express.Router();
 
-  router.get('/', AuthenticationUtils.authenticateSession, (req, res) => {
+  router.get('/', SessionService.authenticateSession, (req, res) => {
     CourseService.findAllCourses()
       .then(courses => {
         courses = courses.map(course => {
@@ -26,7 +29,7 @@ module.exports = (() => {
       });
   });
 
-  router.get('/:id', AuthenticationUtils.authenticateSession, (req, res) => {
+  router.get('/:id', SessionService.authenticateSession, (req, res) => {
     const id = req.params.id;
     CourseService.findCourseById(id)
       .then(course => {
@@ -60,7 +63,7 @@ module.exports = (() => {
       });
   });
 
-  router.put('/:id', AuthenticationUtils.authenticateSession, (req, res) => {
+  router.put('/:id', SessionService.authenticateSession, (req, res) => {
     const id = req.params.id;
     const { name, description, endDate } = req.body;
     CourseService.modifyCourse(id, name, description, endDate)
@@ -80,7 +83,7 @@ module.exports = (() => {
 
   router.get(
     '/:courseId/reminder',
-    AuthenticationUtils.authenticateSession,
+    SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
       ReminderService.findRemindersByCourseId(courseId)
@@ -98,7 +101,7 @@ module.exports = (() => {
     }
   );
 
-  router.post('/', AuthenticationUtils.authenticateSession, (req, res) => {
+  router.post('/', SessionService.authenticateSession, (req, res) => {
     const { name, description, endDate } = req.body;
     const instructors = [req.currentUser];
     CourseService.createCourse(name, description, endDate, instructors)
@@ -120,7 +123,7 @@ module.exports = (() => {
 
   router.delete(
     '/:courseId',
-    AuthenticationUtils.authenticateSession,
+    SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
       CourseService.deleteCourse(courseId)
