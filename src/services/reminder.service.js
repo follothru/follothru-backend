@@ -52,6 +52,19 @@ module.exports = (() => {
     });
   }
 
+  function deleteReminder(reminderId) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(reminderId, 'reminderId');
+        ReminderModel.deleteOne({ _id: reminderId })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   function createReminderWithConfig(config) {
     ValidationUtils.notNull(config);
     const { name, startDate, endDate, repeats, event } = config;
@@ -78,6 +91,7 @@ module.exports = (() => {
     findAllReminders,
     findRemindersByCourseId,
     createReminder,
-    createReminders
+    createReminders,
+    deleteReminder
   };
 })();

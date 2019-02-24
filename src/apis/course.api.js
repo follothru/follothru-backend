@@ -1,9 +1,13 @@
 module.exports = (() => {
   const express = require('express');
-  const { CourseService, ReminderService } = require('../services');
+  const {
+    CourseService,
+    ReminderService,
+    SessionService
+  } = require('../services');
   const router = express.Router();
 
-  router.get('/', (req, res) => {
+  router.get('/', SessionService.authenticateSession, (req, res) => {
     CourseService.findAllCourses()
       .then(courses => {
         courses = courses.map(course => {
@@ -25,15 +29,33 @@ module.exports = (() => {
       });
   });
 
-  router.get('/:id', (req, res) => {
+  router.get('/:id', SessionService.authenticateSession, (req, res) => {
     const id = req.params.id;
     CourseService.findCourseById(id)
       .then(course => {
         if (!course) {
           throw 'Could not find course';
         }
-        const { instructors, name, description } = course;
-        res.send({ id, name, description, instructors });
+        const { name, endDate, description } = course;
+        let instructors = [];
+        if (course.instructors) {
+          instructors = course.instructors.map(instructor => {
+            const { firstname, lastname, email } = instructor;
+            return {
+              id: instructor._id,
+              firstname,
+              lastname,
+              email
+            };
+          });
+        }
+        res.send({
+          id,
+          name,
+          description,
+          endDate,
+          instructors
+        });
       })
       .catch(err => {
         console.error(err);
@@ -41,38 +63,79 @@ module.exports = (() => {
       });
   });
 
-  router.put('/:id', (req, res) => {
+  router.put('/:id', SessionService.authenticateSession, (req, res) => {
     const id = req.params.id;
     const { name, description, endDate } = req.body;
     CourseService.modifyCourse(id, name, description, endDate)
-      .then(() => res.send({ id }))
+      .then(result =>
+        res.send({
+          id: result._id,
+          name: result.name,
+          description: result.description,
+          endDate: result.endDate
+        })
+      )
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
       });
   });
 
-  router.get('/:courseId/reminder', (req, res) => {
-    const { courseId } = req.params;
-    ReminderService.findRemindersByCourseId(courseId)
-      .then(reminders => res.send(reminders))
-      .catch(err => {
-        console.error(err);
-        res.status(500).send(err);
-      });
-  });
+  router.get(
+    '/:courseId/reminder',
+    SessionService.authenticateSession,
+    (req, res) => {
+      const { courseId } = req.params;
+      ReminderService.findRemindersByCourseId(courseId)
+        .then(reminders => {
+          reminders = reminders.map(reminder => {
+            const { name, alerts } = reminder;
+            return { id: reminder._id, name, alerts };
+          });
+          res.send(reminders);
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    }
+  );
 
-  router.post('/', (req, res) => {
-    const { name, description, instructors } = req.body;
-    CourseService.createCourse(name, description, instructors)
+  router.post('/', SessionService.authenticateSession, (req, res) => {
+    const { name, description, endDate } = req.body;
+    const instructors = [req.currentUser];
+    CourseService.createCourse(name, description, endDate, instructors)
       .then(result => {
-        res.send({ id: result._id });
+        const id = result._id;
+        res.send({
+          id,
+          name,
+          description,
+          endDate,
+          instructors
+        });
       })
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
       });
   });
+
+  router.delete(
+    '/:courseId',
+    SessionService.authenticateSession,
+    (req, res) => {
+      const { courseId } = req.params;
+      CourseService.deleteCourse(courseId)
+        .then(result => {
+          res.send(result);
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    }
+  );
 
   return router;
 })();
