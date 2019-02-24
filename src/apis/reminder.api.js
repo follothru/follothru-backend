@@ -29,8 +29,8 @@ module.exports = (() => {
   });
 
   router.post('/', SessionService.authenticateSession, (req, res) => {
-    const { name, courseId } = req.body;
-    ReminderService.createReminder(name, courseId)
+    const { name, courseId, startDate } = req.body;
+    ReminderService.createReminder(name, courseId, startDate)
       .then(result => {
         const id = result._id;
         const { name } = result;

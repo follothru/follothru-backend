@@ -89,8 +89,8 @@ module.exports = (() => {
       ReminderService.findRemindersByCourseId(courseId)
         .then(reminders => {
           reminders = reminders.map(reminder => {
-            const { name, alerts } = reminder;
-            return { id: reminder._id, name, alerts };
+            const { name, alerts, startDate } = reminder;
+            return { id: reminder._id, name, startDate, alerts };
           });
           res.send(reminders);
         })
