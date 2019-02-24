@@ -36,12 +36,12 @@ module.exports = (() => {
     });
   }
 
-  function createReminder(name, courseId) {
+  function createReminder(name, courseId, startDate) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name, 'name');
         const course = new mongoose.Types.ObjectId(courseId);
-        const newReminder = new ReminderModel({ name, course });
+        const newReminder = new ReminderModel({ name, course, startDate });
         newReminder
           .save()
           .then(resolve)
