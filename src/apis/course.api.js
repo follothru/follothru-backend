@@ -8,7 +8,8 @@ module.exports = (() => {
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
-    CourseService.findAllCourses()
+    const { currentUser } = req;
+    CourseService.findAllCoursesForCurrentUser(currentUser)
       .then(courses => {
         courses = courses.map(course => {
           const id = course._id;

@@ -5,7 +5,7 @@ module.exports = (() => {
     ANONYMOUS: 0,
     INSTRUCTOR: 1,
     ADMIN: 2,
-    SUPERADMIN: 3
+    SUPER_ADMIN: 3
   };
 
   const UserSchema = mongoose.Schema({
