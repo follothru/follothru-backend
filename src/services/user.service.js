@@ -82,5 +82,18 @@ module.exports = (() => {
     });
   }
 
-  return { findAllUsers, createUser, findUsersByIds, validateUser, Errors };
+  function isSuperAdmin(user) {
+    return user
+      ? user.groups.some(group => group === user.UserGroup.SUPER_ADMIN)
+      : false;
+  }
+
+  return {
+    findAllUsers,
+    createUser,
+    findUsersByIds,
+    validateUser,
+    Errors,
+    isSuperAdmin
+  };
 })();

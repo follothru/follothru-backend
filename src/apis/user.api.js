@@ -1,9 +1,9 @@
 module.exports = (() => {
   const express = require('express');
-  const { UserService } = require('../services');
+  const { UserService, SessionService } = require('../services');
   const router = express.Router();
 
-  router.get('/', (req, res) => {
+  router.get('/', SessionService.authenticateSession, (req, res) => {
     const { ids } = req.body;
     let promise;
     if (ids && ids.length > 0) {

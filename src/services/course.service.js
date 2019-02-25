@@ -1,10 +1,20 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const CourseModel = require('../models/course.model.js');
+  const UserService = require('./user.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
     return CourseModel.find().populate('instructors');
+  }
+
+  function findAllCoursesForCurrentUser(currentUser) {
+    if (UserService.isSuperAdmin(currentUser)) {
+      return findAllCourses();
+    }
+    return CourseModel.find({ instructors: currentUser }).populate(
+      'instructors'
+    );
   }
 
   function findCourseById(id) {
@@ -75,6 +85,7 @@ module.exports = (() => {
 
   return {
     findAllCourses,
+    findAllCoursesForCurrentUser,
     createCourse,
     findCourseById,
     modifyCourse,
