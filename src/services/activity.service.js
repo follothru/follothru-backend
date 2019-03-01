@@ -1,17 +1,15 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
-  const { EventModel } = require('../models');
+  const { ActivityModel } = require('../models');
   const ValidationUtils = require('../utils/validation.util.js');
 
-  const { MyDate } = require('../utils');
-
-  function findAllEvents() {
-    return EventModel.find().populate('reminders');
+  function findAllActivities() {
+    return ActivityModel.find().populate('reminders');
   }
 
-  function deleteEvent(id) {
+  function deleteActivity(id) {
     return new Promise((resolve, reject) => {
-      EventModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
+      ActivityModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
         .then(result => {
           resolve(result);
         })
@@ -21,7 +19,7 @@ module.exports = (() => {
     });
   }
 
-  function createEvent(config, reminderIds) {
+  function createActivity(config, reminderIds) {
     return new Promise((resolve, reject) => {
       var { course } = config;
       const { name, startDate, endDate, startTime, endTime, repeats } = config;
@@ -50,7 +48,7 @@ module.exports = (() => {
 
       const _id = new mongoose.Types.ObjectId();
 
-      const eventModel = new EventModel({
+      const activityModel = new ActivityModel({
         _id,
         name,
         startDateTime,
@@ -60,40 +58,12 @@ module.exports = (() => {
         reminders
       });
 
-      eventModel
+      activityModel
         .save()
         .then(resolve)
         .catch(reject);
     });
   }
 
-  // function findAllEvents() {
-  //   return EventModel.find().populate('reminders');
-  // }
-
-  // function createEvent(name, date, remindersToCreate) {
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       ValidationUtils.notNullOrEmpty(name);
-  //       // ValidationUtils.notNullOrEmpty(date);
-  //       const _id = new mongoose.Types.ObjectId();
-  //       // date = new Date(date);
-  //       remindersToCreate = remindersToCreate.map(config => {
-  //         config.event = _id;
-  //         return config;
-  //       });
-  //       ReminderService.createReminders(remindersToCreate)
-  //         .then(newReminders => {
-  //           const reminders = newReminders.map(newReminder => newReminder._id);
-  //           const newEvent = new EventModel({ _id, name, date, reminders });
-  //           return newEvent.save();
-  //         })
-  //         .then(resolve);
-  //     } catch (err) {
-  //       reject(err);
-  //     }
-  //   });
-  // }
-
-  return { deleteEvent, findAllEvents, createEvent };
+  return { deleteActivity, findAllActivities, createActivity };
 })();

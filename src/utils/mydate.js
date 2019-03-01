@@ -17,11 +17,13 @@ class MyDate {
       this._year = this.getDateObjectYear();
       this._month = this.getDateObjectMonth() + 1;
       this._date = this.getDateObjectDate();
+      this._time = this.getDateObjectTime();
     } else {
       this._dateObject = this.initDateObjectByDate(config);
       this._year = config.year;
       this._month = config.month;
       this._date = config.date;
+      this._time = config.time;
     }
   }
 
@@ -47,7 +49,13 @@ class MyDate {
       } else {
         this._isDatePossible = true;
         const d = config.year + '/' + config.month + '/' + config.date;
-        return new Date(d);
+        const timeSplit = config.time.split(':');
+        const h = timeSplit[0] ? parseInt(timeSplit[0]) : '';
+        const m = timeSplit[1] ? parseInt(timeSplit[1]) : '';
+        const s = timeSplit[2] ? parseInt(timeSplit[2]) : '';
+        const date = new Date(d);
+        date.setHours(h, m, s);
+        return date;
       }
     } catch (err) {
       return null;
@@ -59,11 +67,7 @@ class MyDate {
   }
 
   getDateObjectYear() {
-    try {
-      return this._dateObject.getFullYear();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getFullYear();
   }
 
   getIsDatePossible() {
@@ -75,11 +79,7 @@ class MyDate {
   }
 
   getDateObjectMonth() {
-    try {
-      return this._dateObject.getMonth();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getMonth();
   }
 
   getDate() {
@@ -87,52 +87,44 @@ class MyDate {
   }
 
   getDateObjectDate() {
-    try {
-      return this._dateObject.getDate();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getDate();
+  }
+
+  getDateObjectTime() {
+    return (
+      (this._dateObject.getHours() > 10
+        ? this._dateObject.getHours()
+        : '0' + this._dateObject.getHours()) +
+      ':' +
+      (this._dateObject.getMinutes() > 10
+        ? this._dateObject.getMinutes()
+        : '0' + this._dateObject.getMinutes()) +
+      ':' +
+      (this._dateObject.getSeconds() > 10
+        ? this._dateObject.getSeconds()
+        : '0' + this._dateObject.getSeconds())
+    );
   }
 
   getHours() {
-    try {
-      return this._dateObject.getHours();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getHours();
   }
 
   getMinutes() {
-    try {
-      return this._dateObject.getMinutes();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getMinutes();
   }
 
   getSeconds() {
-    try {
-      return this._dateObject.getSeconds();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getSeconds();
   }
 
   // gets millisecond representation of time object
   getTime() {
-    try {
-      return this._dateObject.getTime();
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject.getTime();
   }
 
   getDateObject() {
-    try {
-      return this._dateObject;
-    } catch (err) {
-      return new Exception(MyDateMessageKey.DATE_OBJECT_EXCEPTION);
-    }
+    return this._dateObject;
   }
 
   toString() {
@@ -212,16 +204,20 @@ class MyDate {
         const myDate = new MyDate({
           year: yearOffSet,
           month: monthOffSet,
-          date: this.getDate()
+          date: this.getDate(),
+          time: this.getTime()
         });
         if (
           myDate.getIsDatePossible() &&
+          myDate.getDateObject() !== null &&
           myDate.getTime() <= endDate.getTime()
         ) {
           return myDate;
         }
       }
     });
+    // adds the startDate to the array
+    months.unshift(this);
     return months;
   }
   getDaysInMonthAndYear(year, month) {

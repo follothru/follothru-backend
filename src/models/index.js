@@ -4,7 +4,7 @@ const CourseModel = require('./course.model.js');
 const ReminderModel = require('./reminder.model.js');
 const StudentModel = require('./student.model.js');
 const EventModel = require('./event.model.js');
-const SubreminderModel = require('./subreminder.model.js');
+const ActivityModel = require('./activity.model.js');
 
 module.exports = {
   UserModel,
@@ -13,5 +13,5 @@ module.exports = {
   ReminderModel,
   StudentModel,
   EventModel,
-  SubreminderModel
+  ActivityModel
 };

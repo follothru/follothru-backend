@@ -6,48 +6,59 @@ module.exports = (() => {
     Exception
   } = require('../utils');
   const express = require('express');
-  const { ReminderService, SessionService } = require('../services');
+  const {
+    ReminderService,
+    SessionService,
+    EventService,
+    ActivityService
+  } = require('../services');
 
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
-    ReminderService.findAllReminders()
-      .then(reminders =>
-        reminders.map(reminder => {
-          const id = reminder._id;
-          const { name, startDate, endDate, course } = reminder;
-          let event = null;
-          if (reminder.event) {
-            event = {
-              id: reminder.event._id,
-              name: reminder.event.name,
-              date: reminder.event.date
-            };
-          }
-          return { id, name, startDate, endDate, event, course };
-        })
-      )
-      .then(reminders => res.send(reminders))
+    var all = [];
+    ActivityService.findAllActivities()
+      .then(activities => {
+        all = all.concat(activities);
+        return EventService.findAllEvents();
+      })
+      .then(events => {
+        all = all.concat(events);
+        res.send(events);
+      })
       .catch(err => {
-        console.error(err);
-        res.status(500).send(err);
+        console.log(err);
+        res.send(err);
       });
   });
 
   router.post('/', SessionService.authenticateSession, (req, res) => {
-    const { name, courseId, startDate } = req.body;
-    ReminderService.createReminder(name, courseId, startDate)
-      .then(result => {
-        const id = result._id;
-        const { name } = result;
-        res.send({
-          id,
-          name
-        });
+    const { type } = req.body;
+    const EVENT = /EVENT/i;
+    const ACTIVITY = /ACTIVITY/i;
+
+    ReminderService.createReminder(req.body)
+      .then(reminderModelIds => {
+        if (type.match(EVENT)) {
+          EventService.createEvent(req.body, reminderModelIds)
+            .then(reminder => {
+              res.send(reminder).status(200);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        } else if (type.match(ACTIVITY)) {
+          ActivityService.createActivity(req.body, reminderModelIds)
+            .then(reminder => {
+              res.send(reminder).status(200);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }
       })
       .catch(err => {
-        console.error(err);
-        res.status(500).send(err);
+        console.log(err);
       });
   });
 
@@ -56,16 +67,21 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { reminderId } = req.params;
-      ReminderService.deleteReminder(reminderId)
+      ActivityService.deleteActivity(reminderId)
         .then(result => {
           if (result.n <= 0) {
-            throw new Error('Failed to delete reminder.');
+            // try deleting it from Event Service
+            return EventService.deleteEvent(reminderId);
           }
-          res.send({});
+        })
+        .then(result => {
+          if (result.n <= 0) {
+            throw 'reminder does not exist';
+          }
+          res.status(200).send('deleted successfully');
         })
         .catch(err => {
-          console.error(err);
-          res.status(400).send(err);
+          console.log(err);
         });
     }
   );

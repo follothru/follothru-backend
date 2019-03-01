@@ -4,7 +4,7 @@ const UserService = require('./user.service.js');
 const SessionService = require('./session.service.js');
 const StudentService = require('./student.service.js');
 const EventService = require('./event.service.js');
-const SubreminderService = require('./subreminder.service.js');
+const ActivityService = require('./activity.service.js');
 
 module.exports = {
   ReminderService,
@@ -13,5 +13,5 @@ module.exports = {
   SessionService,
   StudentService,
   EventService,
-  SubreminderService
+  ActivityService
 };
