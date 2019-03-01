@@ -1,10 +1,4 @@
 module.exports = (() => {
-  const {
-    MyDateMessageKey,
-    MessageKey,
-    ValidationUtil,
-    Exception
-  } = require('../utils');
   const express = require('express');
   const {
     ReminderService,

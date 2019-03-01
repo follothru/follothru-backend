@@ -1,7 +1,6 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const { EventModel } = require('../models');
-  const ValidationUtils = require('../utils/validation.util.js');
 
   const { MyDate } = require('../utils');
 

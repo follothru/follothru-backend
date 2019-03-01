@@ -1,7 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const { ActivityModel } = require('../models');
-  const ValidationUtils = require('../utils/validation.util.js');
+  const { MyDate } = require('../utils');
 
   function findAllActivities() {
     return ActivityModel.find().populate('reminders');
