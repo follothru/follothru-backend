@@ -2,7 +2,8 @@ module.exports = (() => {
   const express = require('express');
   const {
     CourseService,
-    ReminderService,
+    ActivityService,
+    EventService,
     SessionService
   } = require('../services');
   const router = express.Router();
@@ -87,17 +88,19 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      ReminderService.findRemindersByCourseId(courseId)
+      var all = [];
+      ActivityService.getRemindersByCourseId(courseId)
         .then(reminders => {
-          reminders = reminders.map(reminder => {
-            const { name, alerts, startDate } = reminder;
-            return { id: reminder._id, name, startDate, alerts };
-          });
-          res.send(reminders);
+          all = all.concat(reminders);
+          return EventService.getRemindersByCourseId(courseId);
+        })
+        .then(reminders => {
+          all = all.concat(reminders);
+          res.send(all).status(200);
         })
         .catch(err => {
-          console.error(err);
-          res.status(500).send(err);
+          console.log(err);
+          res.send(err).status(500);
         });
     }
   );

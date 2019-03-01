@@ -9,6 +9,11 @@ module.exports = (() => {
     return EventModel.find().populate('reminders');
   }
 
+  function getRemindersByCourseId(course) {
+    course = new mongoose.Types.ObjectId(course);
+    return EventModel.find({ course }).populate('reminders');
+  }
+
   function deleteEvent(id) {
     return new Promise((resolve, reject) => {
       EventModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
@@ -95,5 +100,5 @@ module.exports = (() => {
   //   });
   // }
 
-  return { deleteEvent, findAllEvents, createEvent };
+  return { deleteEvent, findAllEvents, createEvent, getRemindersByCourseId };
 })();

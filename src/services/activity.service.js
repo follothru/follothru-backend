@@ -7,6 +7,11 @@ module.exports = (() => {
     return ActivityModel.find().populate('reminders');
   }
 
+  function getRemindersByCourseId(course) {
+    course = new mongoose.Types.ObjectId(course);
+    return ActivityModel.find({ course }).populate('reminders');
+  }
+
   function deleteActivity(id) {
     return new Promise((resolve, reject) => {
       ActivityModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
@@ -65,5 +70,10 @@ module.exports = (() => {
     });
   }
 
-  return { deleteActivity, findAllActivities, createActivity };
+  return {
+    deleteActivity,
+    findAllActivities,
+    createActivity,
+    getRemindersByCourseId
+  };
 })();
