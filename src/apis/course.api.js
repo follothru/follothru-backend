@@ -4,7 +4,8 @@ module.exports = (() => {
     CourseService,
     ActivityService,
     EventService,
-    SessionService
+    SessionService,
+    VaultService
   } = require('../services');
   const router = express.Router();
 
@@ -88,19 +89,13 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      var all = [];
-      ActivityService.getRemindersByCourseId(courseId)
-        .then(reminders => {
-          all = all.concat(reminders);
-          return EventService.getRemindersByCourseId(courseId);
-        })
-        .then(reminders => {
-          all = all.concat(reminders);
-          res.send(all).status(200);
+      VaultService.getRemindersByCourseId(courseId)
+        .then(result => {
+          res.send(result).status(200);
         })
         .catch(err => {
-          console.log(err);
           res.send(err).status(500);
+          console.error(err);
         });
     }
   );

@@ -5,12 +5,54 @@ module.exports = (() => {
   const { MyDate } = require('../utils');
 
   function findAllEvents() {
-    return EventModel.find().populate('reminders');
+    return new Promise((resolve, reject) => {
+      EventModel.find()
+        .populate('reminders')
+        .then(events => {
+          events = filterEvents(events);
+          resolve(events);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 
   function getRemindersByCourseId(course) {
     course = new mongoose.Types.ObjectId(course);
-    return EventModel.find({ course }).populate('reminders');
+    return new Promise((resolve, reject) => {
+      EventModel.find({ course })
+        .populate('reminders')
+        .then(events => {
+          events = filterEvents(events);
+          resolve(events);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  // private function
+  // determines what will exposed to API
+  function filterEvents(events) {
+    events = events.map(event => {
+      const { name, startDateTime, endDateTime, course, repeats } = event;
+      let { reminders } = event;
+      reminders = reminders.map(reminder => {
+        const { name, dateTime } = reminder;
+        return { name, dateTime };
+      });
+      return {
+        name,
+        startDateTime,
+        endDateTime,
+        course,
+        reminders,
+        repeats
+      };
+    });
+    return events;
   }
 
   function deleteEvent(id) {

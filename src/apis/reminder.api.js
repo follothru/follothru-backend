@@ -4,24 +4,18 @@ module.exports = (() => {
     ReminderService,
     SessionService,
     EventService,
-    ActivityService
+    ActivityService,
+    VaultService
   } = require('../services');
 
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
-    var all = [];
-    ActivityService.findAllActivities()
-      .then(activities => {
-        all = all.concat(activities);
-        return EventService.findAllEvents();
-      })
-      .then(events => {
-        all = all.concat(events);
-        res.send(events);
+    VaultService.findAll()
+      .then(results => {
+        res.send(results).status(500);
       })
       .catch(err => {
-        console.log(err);
         res.send(err);
       });
   });
@@ -36,7 +30,8 @@ module.exports = (() => {
         if (type.match(EVENT)) {
           EventService.createEvent(req.body, reminderModelIds)
             .then(reminder => {
-              res.send(reminder).status(200);
+              const { name } = reminder;
+              res.send(name + ' created successfully').status(200);
             })
             .catch(err => {
               console.log(err);
@@ -44,7 +39,8 @@ module.exports = (() => {
         } else if (type.match(ACTIVITY)) {
           ActivityService.createActivity(req.body, reminderModelIds)
             .then(reminder => {
-              res.send(reminder).status(200);
+              const { name } = reminder;
+              res.send(name + ' created successfully').status(200);
             })
             .catch(err => {
               console.log(err);
@@ -61,21 +57,13 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { reminderId } = req.params;
-      ActivityService.deleteActivity(reminderId)
+      VaultService.deleteReminderById(reminderId)
         .then(result => {
-          if (result.n <= 0) {
-            // try deleting it from Event Service
-            return EventService.deleteEvent(reminderId);
-          }
-        })
-        .then(result => {
-          if (result.n <= 0) {
-            throw 'reminder does not exist';
-          }
-          res.status(200).send('deleted successfully');
+          res.send(result);
         })
         .catch(err => {
-          console.log(err);
+          res.send(err);
+          console.error(err);
         });
     }
   );
