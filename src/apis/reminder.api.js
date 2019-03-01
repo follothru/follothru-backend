@@ -34,7 +34,7 @@ module.exports = (() => {
               res.send(name + ' created successfully').status(200);
             })
             .catch(err => {
-              console.log(err);
+              console.error(err);
             });
         } else if (type.match(ACTIVITY)) {
           ActivityService.createActivity(req.body, reminderModelIds)
@@ -43,12 +43,12 @@ module.exports = (() => {
               res.send(name + ' created successfully').status(200);
             })
             .catch(err => {
-              console.log(err);
+              res.send(err);
             });
         }
       })
       .catch(err => {
-        console.log(err);
+        res.send(err);
       });
   });
 
@@ -63,7 +63,6 @@ module.exports = (() => {
         })
         .catch(err => {
           res.send(err);
-          console.error(err);
         });
     }
   );
