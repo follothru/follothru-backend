@@ -68,7 +68,7 @@ module.exports = (() => {
 
   function createActivity(config, reminderIds) {
     return new Promise((resolve, reject) => {
-      var { course } = config;
+      let { course } = config;
       const { name, startDate, endDate, startTime, endTime, repeats } = config;
       const startDateSplit = startDate.split('-');
       const endDateSplit = endDate.split('-');
