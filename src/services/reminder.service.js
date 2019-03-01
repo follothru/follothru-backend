@@ -95,8 +95,8 @@ module.exports = (() => {
         return [];
       }
     });
-    var convertToOneDArr = [];
-    for (var i = 0; i < occurrence.length; i++) {
+    let convertToOneDArr = [];
+    for (let i = 0; i < occurrence.length; i++) {
       convertToOneDArr = convertToOneDArr.concat(occurrence[i]);
     }
     return convertToOneDArr;
