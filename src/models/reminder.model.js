@@ -15,10 +15,10 @@ module.exports = (() => {
     name: String,
     startDate: Date,
     endDate: Date,
-    event: { type: mongoose.Schema.Types.ObjectId, ref: 'EventModel' },
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
-    repeats: [String],
-    alerts: []
+    actions: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'ReminderActionModel' }
+    ],
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' }
   });
 
   ReminderSchema.virtual('RepeatMode').get(() => RepeatMode);

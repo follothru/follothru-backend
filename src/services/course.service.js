@@ -2,6 +2,7 @@ module.exports = (() => {
   const mongoose = require('mongoose');
   const CourseModel = require('../models/course.model.js');
   const UserService = require('./user.service.js');
+  const ReminderService = require('./reminder.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
@@ -23,10 +24,18 @@ module.exports = (() => {
       .then(courses => courses[0]);
   }
 
-  function createCourse(name, description, endDate, instructors) {
+  function createCourse(config) {
+    const {
+      name,
+      description,
+      endDate,
+      instructors,
+      hasPlanningPrompt,
+      planningPrompt
+    } = config;
     return new Promise((resolve, reject) => {
       try {
-        ValidationUtils.notNullOrEmpty(name);
+        ValidationUtils.notNullOrEmpty(name, 'name');
         const _id = new mongoose.Types.ObjectId();
         const approved = false;
         const newCourse = new CourseModel({
@@ -35,8 +44,12 @@ module.exports = (() => {
           description,
           endDate,
           approved,
-          instructors
+          instructors,
+          hasPlanningPrompt
         });
+        if (hasPlanningPrompt) {
+          newCourse.planningPrompt = planningPrompt;
+        }
         newCourse
           .save()
           .then(resolve)
@@ -47,7 +60,15 @@ module.exports = (() => {
     });
   }
 
-  function modifyCourse(courseId, name, description, endDate) {
+  function modifyCourse(config) {
+    const {
+      courseId,
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    } = config;
     return findCourseById(courseId).then(course => {
       if (name) {
         course.name = name;
@@ -57,6 +78,10 @@ module.exports = (() => {
       }
       if (endDate) {
         course.endDate = endDate;
+      }
+      course.hasPlanningPrompt = hasPlanningPrompt === true;
+      if (hasPlanningPrompt) {
+        course.planningPrompt = planningPrompt;
       }
       course.save();
       return course;
@@ -83,12 +108,28 @@ module.exports = (() => {
     });
   }
 
+  function createReminders(courseId, name, startDate, endDate, repeats) {
+    return ReminderService.createReminders(
+      courseId,
+      name,
+      startDate,
+      endDate,
+      repeats
+    );
+  }
+
+  function getReminders(courseId) {
+    return ReminderService.findRemindersByCourseId(courseId);
+  }
+
   return {
     findAllCourses,
     findAllCoursesForCurrentUser,
     createCourse,
     findCourseById,
     modifyCourse,
-    deleteCourse
+    deleteCourse,
+    createReminders,
+    getReminders
   };
 })();

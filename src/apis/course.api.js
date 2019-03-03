@@ -1,10 +1,6 @@
 module.exports = (() => {
   const express = require('express');
-  const {
-    CourseService,
-    ReminderService,
-    SessionService
-  } = require('../services');
+  const { CourseService, SessionService } = require('../services');
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
@@ -37,7 +33,13 @@ module.exports = (() => {
         if (!course) {
           throw 'Could not find course';
         }
-        const { name, endDate, description } = course;
+        const {
+          name,
+          endDate,
+          description,
+          planningPrompt,
+          hasPlanningPrompt
+        } = course;
         let instructors = [];
         if (course.instructors) {
           instructors = course.instructors.map(instructor => {
@@ -55,7 +57,9 @@ module.exports = (() => {
           name,
           description,
           endDate,
-          instructors
+          instructors,
+          hasPlanningPrompt,
+          planningPrompt
         });
       })
       .catch(err => {
@@ -65,9 +69,22 @@ module.exports = (() => {
   });
 
   router.put('/:id', SessionService.authenticateSession, (req, res) => {
-    const id = req.params.id;
-    const { name, description, endDate } = req.body;
-    CourseService.modifyCourse(id, name, description, endDate)
+    const courseId = req.params.id;
+    const {
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    } = req.body;
+    CourseService.modifyCourse({
+      courseId,
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    })
       .then(result =>
         res.send({
           id: result._id,
@@ -87,11 +104,17 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      ReminderService.findRemindersByCourseId(courseId)
+      CourseService.getReminders(courseId)
         .then(reminders => {
           reminders = reminders.map(reminder => {
-            const { name, alerts, startDate } = reminder;
-            return { id: reminder._id, name, startDate, alerts };
+            const { name, startDate, endDate } = reminder;
+            let actions = [];
+            if (reminder.actions) {
+              actions = reminder.actions.map(action => {
+                return { name: action.name, dateTime: action.dateTime };
+              });
+            }
+            return { id: reminder._id, name, startDate, endDate, actions };
           });
           res.send(reminders);
         })
@@ -102,10 +125,42 @@ module.exports = (() => {
     }
   );
 
+  router.post(
+    '/:courseId/reminder',
+    SessionService.authenticateSession,
+    (req, res) => {
+      const { courseId } = req.params;
+      const { name, startDate, endDate, repeats } = req.body;
+      CourseService.createReminders(courseId, name, startDate, endDate, repeats)
+        .then(reminder => {
+          res.send({
+            id: reminder._id
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    }
+  );
+
   router.post('/', SessionService.authenticateSession, (req, res) => {
-    const { name, description, endDate } = req.body;
+    const {
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    } = req.body;
     const instructors = [req.currentUser];
-    CourseService.createCourse(name, description, endDate, instructors)
+    CourseService.createCourse({
+      name,
+      description,
+      endDate,
+      instructors,
+      hasPlanningPrompt,
+      planningPrompt
+    })
       .then(result => {
         const id = result._id;
         res.send({
@@ -113,7 +168,8 @@ module.exports = (() => {
           name,
           description,
           endDate,
-          instructors
+          instructors,
+          planningPrompt
         });
       })
       .catch(err => {
