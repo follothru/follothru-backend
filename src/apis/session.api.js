@@ -28,7 +28,9 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+          error: err.message
+        });
       });
   });
 
@@ -58,8 +60,7 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        const { message } = err;
-        res.status(400).send({ message });
+        res.status(400).send({ error: err.message });
       });
   });
 

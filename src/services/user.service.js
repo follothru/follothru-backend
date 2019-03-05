@@ -14,10 +14,11 @@ module.exports = (() => {
   function createUser(firstname, lastname, email, password) {
     return new Promise((resolve, reject) => {
       try {
-        ValidationUtils.notNullOrEmpty(firstname);
-        ValidationUtils.notNullOrEmpty(lastname);
-        ValidationUtils.notNullOrEmpty(email);
-        ValidationUtils.notNullOrEmpty(password);
+        ValidationUtils.notNullOrEmpty(firstname, 'firstname');
+        ValidationUtils.notNullOrEmpty(lastname, 'lastname');
+        ValidationUtils.notNullOrEmpty(email, 'email');
+        ValidationUtils.notNullOrEmpty(password, 'password');
+
         findUserByEmail(email)
           .then(user => {
             if (user) {

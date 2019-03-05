@@ -1,6 +1,6 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
-  const { ValidationUtils } = require('../utils');
+  const ValidationUtils = require('../utils/validation.util.js');
   const { SessionModel } = require('../models');
   const UserService = require('./user.service.js');
 
@@ -19,13 +19,14 @@ module.exports = (() => {
     });
   }
 
-  function validateUserSession(_id) {
+  function validateUserSession(authToken) {
     return new Promise((resolve, reject) => {
-      SessionModel.findOne({ _id })
+      const token = authToken.replace('Bearer ', '');
+      SessionModel.findOne({ _id: token })
         .populate('user')
         .then(result => {
           if (result === null) {
-            const error = `Session '${_id}' not found.`;
+            const error = `Session '${authToken}' not found.`;
             reject({ error });
             return;
           }
@@ -49,6 +50,7 @@ module.exports = (() => {
 
   function authenticateSession(req, res, next) {
     const { authorization } = req.headers;
+
     validateUserSession(authorization)
       .then(result => {
         req.currentUser = result.user;

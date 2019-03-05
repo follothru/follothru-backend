@@ -2,6 +2,7 @@ module.exports = (() => {
   const mongoose = require('mongoose');
   const CourseModel = require('../models/course.model.js');
   const UserService = require('./user.service.js');
+  const ReminderService = require('./reminder.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
@@ -67,11 +68,13 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(courseId, 'courseId');
-        CourseModel.deleteOne({ _id: courseId })
+        ReminderService.deleteRemindersByCourseId(courseId);
+        CourseModel.deleteOne({ _id: new mongoose.Types.ObjectId(courseId) })
           .then(result => {
             if (result.n <= 0) {
-              const error = `Failed to delete course: no course found with id ${courseId}`;
-              throw new Error(error);
+              const error = `Failed to delete course: no course found with id '${courseId}'`;
+              reject(new Error(error));
+              return;
             }
             resolve(result);
             return result;
@@ -83,12 +86,29 @@ module.exports = (() => {
     });
   }
 
+  function createReminders(courseId, name, type, startDate, endDate, repeats) {
+    return ReminderService.createReminders(
+      courseId,
+      name,
+      type,
+      startDate,
+      endDate,
+      repeats
+    );
+  }
+
+  function getRemindersByCourseId(courseId) {
+    return ReminderService.getRemindersByCourseId(courseId);
+  }
+
   return {
     findAllCourses,
     findAllCoursesForCurrentUser,
     createCourse,
     findCourseById,
     modifyCourse,
-    deleteCourse
+    deleteCourse,
+    createReminders,
+    getRemindersByCourseId
   };
 })();

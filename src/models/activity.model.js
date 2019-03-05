@@ -1,7 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
 
-  const EventSchema = mongoose.Schema({
+  const ActivitySchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
     dateTime: Date,
@@ -11,5 +11,5 @@ module.exports = (() => {
     }
   });
 
-  return mongoose.model('EventModel', EventSchema);
+  return mongoose.model('ActivityModel', ActivitySchema);
 })();
