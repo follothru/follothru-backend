@@ -3,7 +3,6 @@ module.exports = (() => {
   const { ValidationUtils } = require('../utils');
   const { SessionModel } = require('../models');
   const UserService = require('./user.service.js');
-  const { Config } = require('../configs');
 
   function createUserSession(username, password) {
     return new Promise((resolve, reject) => {

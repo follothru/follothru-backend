@@ -4,13 +4,9 @@ module.exports = (() => {
 
   const router = express.Router();
 
-  router.delete(
-    '/:reminderId',
-    SessionService.authenticateSession,
-    (req, res) => {
-      //todo
-    }
-  );
+  router.delete('/:reminderId', SessionService.authenticateSession, () => {
+    //todo
+  });
 
   return router;
 })();

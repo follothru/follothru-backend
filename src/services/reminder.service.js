@@ -1,6 +1,8 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const ValidationUtils = require('../utils/validation.util.js');
+  const ActivityService = require('./activity.service.js');
+  const EventService = require('./event.service.js');
 
   const {
     ReminderModel,
