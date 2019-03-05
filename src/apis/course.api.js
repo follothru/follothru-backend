@@ -91,31 +91,35 @@ module.exports = (() => {
               id: result._id,
               name,
               events: events.map(event => {
+                let subreminder = null;
+                if (event.subreminder) {
+                  subreminder = {
+                    id: event.subreminder._id,
+                    name: event.subreminder.name,
+                    dateTime: event.subreminder.dateTime
+                  };
+                }
                 return {
                   id: event._id,
                   name: event.name,
                   dateTime: event.dateTime,
-                  subreminder: event.subreminder
-                    ? {
-                        id: event.subreminder._id,
-                        name: event.subreminder.name,
-                        dateTime: event.subreminder.dateTime
-                      }
-                    : null
+                  subreminder: subreminder
                 };
               }),
               activities: activities.map(activity => {
+                let subreminder = null;
+                if (activity.subreminder) {
+                  subreminder = {
+                    id: event.subreminder._id,
+                    name: event.subreminder.name,
+                    dateTime: event.subreminder.dateTime
+                  };
+                }
                 return {
                   id: activity._id,
                   name: activity.name,
                   dateTime: activity.dateTime,
-                  subreminder: activity.subreminder
-                    ? {
-                        id: activity.subreminder._id,
-                        name: activity.subreminder.name,
-                        dateTime: activity.subreminder.dateTime
-                      }
-                    : null
+                  subreminder
                 };
               })
             };
