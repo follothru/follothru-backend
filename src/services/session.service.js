@@ -49,12 +49,6 @@ module.exports = (() => {
   }
 
   function authenticateSession(req, res, next) {
-    // skip the authentication if it's not in production
-    if (!Config.prod) {
-      next();
-      return;
-    }
-
     const { authorization } = req.headers;
     validateUserSession(authorization)
       .then(result => {
