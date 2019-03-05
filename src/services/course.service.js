@@ -24,7 +24,14 @@ module.exports = (() => {
       .then(courses => courses[0]);
   }
 
-  function createCourse(name, description, endDate, instructors) {
+  function createCourse(
+    name,
+    description,
+    endDate,
+    instructors,
+    hasPlanningPrompt,
+    planningPrompt
+  ) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(name);
@@ -36,7 +43,9 @@ module.exports = (() => {
           description,
           endDate,
           approved,
-          instructors
+          instructors,
+          hasPlanningPrompt,
+          planningPrompt
         });
         newCourse
           .save()
@@ -48,7 +57,14 @@ module.exports = (() => {
     });
   }
 
-  function modifyCourse(courseId, name, description, endDate) {
+  function modifyCourse(
+    courseId,
+    name,
+    description,
+    endDate,
+    hasPlanningPrompt,
+    planningPrompt
+  ) {
     return findCourseById(courseId).then(course => {
       if (name) {
         course.name = name;
@@ -59,6 +75,11 @@ module.exports = (() => {
       if (endDate) {
         course.endDate = endDate;
       }
+      course.hasPlanningPrompt = hasPlanningPrompt;
+      planningPrompt = hasPlanningPrompt
+        ? planningPrompt
+        : course.planningPrompt;
+      course.planningPrompt = planningPrompt;
       course.save();
       return course;
     });
