@@ -22,7 +22,9 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+          error: err.message
+        });
       });
   });
 
@@ -56,7 +58,9 @@ module.exports = (() => {
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+          error: err.message
+        });
       });
   });
 
@@ -74,7 +78,9 @@ module.exports = (() => {
       )
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+          error: err.message
+        });
       });
   });
 
@@ -110,9 +116,9 @@ module.exports = (() => {
                 let subreminder = null;
                 if (activity.subreminder) {
                   subreminder = {
-                    id: event.subreminder._id,
-                    name: event.subreminder.name,
-                    dateTime: event.subreminder.dateTime
+                    id: activity.subreminder._id,
+                    name: activity.subreminder.name,
+                    dateTime: activity.subreminder.dateTime
                   };
                 }
                 return {
@@ -124,11 +130,13 @@ module.exports = (() => {
               })
             };
           });
-          res.send(results).status(200);
+          res.send(results);
         })
         .catch(err => {
-          res.send(err).status(500);
           console.error(err);
+          res.status(500).send({
+            error: err.message
+          });
         });
     }
   );
@@ -154,7 +162,9 @@ module.exports = (() => {
         })
         .catch(err => {
           console.error(err);
-          res.status(500).send(err);
+          res.status(500).send({
+            error: err.message
+          });
         });
     }
   );
@@ -170,12 +180,21 @@ module.exports = (() => {
           name,
           description,
           endDate,
-          instructors
+          instructors: instructors.map(instructor => {
+            return {
+              id: instructor._id,
+              firstname: instructor.firstname,
+              lastname: instructor.lastname,
+              email: instructor.email
+            };
+          })
         });
       })
       .catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+          error: err.message
+        });
       });
   });
 
@@ -186,11 +205,15 @@ module.exports = (() => {
       const { courseId } = req.params;
       CourseService.deleteCourse(courseId)
         .then(result => {
-          res.send(result);
+          res.send({
+            n: result.n
+          });
         })
         .catch(err => {
           console.error(err);
-          res.status(500).send(err);
+          res.status(500).send({
+            error: err.message
+          });
         });
     }
   );

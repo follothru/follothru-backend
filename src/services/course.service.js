@@ -68,11 +68,13 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(courseId, 'courseId');
-        CourseModel.deleteOne({ _id: courseId })
+        ReminderService.deleteRemindersByCourseId(courseId);
+        CourseModel.deleteOne({ _id: new mongoose.Types.ObjectId(courseId) })
           .then(result => {
             if (result.n <= 0) {
-              const error = `Failed to delete course: no course found with id ${courseId}`;
-              throw new Error(error);
+              const error = `Failed to delete course: no course found with id '${courseId}'`;
+              reject(new Error(error));
+              return;
             }
             resolve(result);
             return result;

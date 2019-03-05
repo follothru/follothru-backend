@@ -1,6 +1,6 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
-  const { ActivityModel } = require('../models');
+  const { ActivityModel, SubreminderModel } = require('../models');
 
   function findAllActivities() {
     return new Promise((resolve, reject) => {
@@ -65,8 +65,29 @@ module.exports = (() => {
     });
   }
 
+  function deleteActivities(activities) {
+    return new Promise((resolve, reject) => {
+      if (!activities || activities.length <= 0) {
+        resolve({});
+        return;
+      }
+      const subreminderIds = activities
+        .map(activity => activity.subreminder)
+        .map(subreminder => subreminder._id);
+      const activityIds = activities.map(activity => activity._id);
+
+      Promise.all([
+        SubreminderModel.deleteMany({ _id: { $in: subreminderIds } }),
+        ActivityModel.deleteMany({ _id: { $in: activityIds } })
+      ])
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
   return {
     deleteActivity,
+    deleteActivities,
     findAllActivities,
     getRemindersByCourseId
   };
