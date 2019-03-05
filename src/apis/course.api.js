@@ -1,12 +1,6 @@
 module.exports = (() => {
   const express = require('express');
-  const {
-    CourseService,
-    ActivityService,
-    EventService,
-    SessionService,
-    VaultService
-  } = require('../services');
+  const { CourseService, SessionService } = require('../services');
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
@@ -37,7 +31,7 @@ module.exports = (() => {
     CourseService.findCourseById(id)
       .then(course => {
         if (!course) {
-          throw 'Could not find course';
+          throw new Error('Could not find course');
         }
         const { name, endDate, description } = course;
         let instructors = [];
@@ -89,13 +83,74 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      VaultService.getRemindersByCourseId(courseId)
-        .then(result => {
-          res.send(result).status(200);
+      CourseService.getRemindersByCourseId(courseId)
+        .then(results => {
+          results = results.map(result => {
+            const { name, events, activities } = result;
+            return {
+              id: result._id,
+              name,
+              events: events.map(event => {
+                return {
+                  id: event._id,
+                  name: event.name,
+                  dateTime: event.dateTime,
+                  subreminder: event.subreminder
+                    ? {
+                        id: event.subreminder._id,
+                        name: event.subreminder.name,
+                        dateTime: event.subreminder.dateTime
+                      }
+                    : null
+                };
+              }),
+              activities: activities.map(activity => {
+                return {
+                  id: activity._id,
+                  name: activity.name,
+                  dateTime: activity.dateTime,
+                  subreminder: activity.subreminder
+                    ? {
+                        id: activity.subreminder._id,
+                        name: activity.subreminder.name,
+                        dateTime: activity.subreminder.dateTime
+                      }
+                    : null
+                };
+              })
+            };
+          });
+          res.send(results).status(200);
         })
         .catch(err => {
           res.send(err).status(500);
           console.error(err);
+        });
+    }
+  );
+
+  router.post(
+    '/:courseId/reminder',
+    SessionService.authenticateSession,
+    (req, res) => {
+      const { courseId } = req.params;
+      const { name, startDate, endDate, repeats, type } = req.body;
+      CourseService.createReminders(
+        courseId,
+        name,
+        type,
+        startDate,
+        endDate,
+        repeats
+      )
+        .then(reminder => {
+          res.send({
+            id: reminder._id
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
         });
     }
   );

@@ -10,48 +10,6 @@ module.exports = (() => {
 
   const router = express.Router();
 
-  router.get('/', SessionService.authenticateSession, (req, res) => {
-    VaultService.findAll()
-      .then(results => {
-        res.send(results).status(500);
-      })
-      .catch(err => {
-        res.send(err);
-      });
-  });
-
-  router.post('/', SessionService.authenticateSession, (req, res) => {
-    const { type } = req.body;
-    const EVENT = /EVENT/i;
-    const ACTIVITY = /ACTIVITY/i;
-
-    ReminderService.createReminder(req.body)
-      .then(reminderModelIds => {
-        if (type.match(EVENT)) {
-          EventService.createEvent(req.body, reminderModelIds)
-            .then(reminder => {
-              const { name } = reminder;
-              res.send(name + ' created successfully').status(200);
-            })
-            .catch(err => {
-              console.error(err);
-            });
-        } else if (type.match(ACTIVITY)) {
-          ActivityService.createActivity(req.body, reminderModelIds)
-            .then(reminder => {
-              const { name } = reminder;
-              res.send(name + ' created successfully').status(200);
-            })
-            .catch(err => {
-              res.send(err);
-            });
-        }
-      })
-      .catch(err => {
-        res.send(err);
-      });
-  });
-
   router.delete(
     '/:reminderId',
     SessionService.authenticateSession,

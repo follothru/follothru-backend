@@ -43,7 +43,7 @@ module.exports = (() => {
     course = new mongoose.Types.ObjectId(course);
     return new Promise((resolve, reject) => {
       ActivityModel.find({ course })
-        .populate('reminders')
+        .populate('subreminder')
         .then(results => {
           results = filterActivities(results);
           resolve(results);

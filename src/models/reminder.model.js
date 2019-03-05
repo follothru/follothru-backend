@@ -1,26 +1,22 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
 
-  // const RepeatMode = {
-  //   EVERYDAY: 'EVERY 1 DAY',
-  //   MONDAY: 'MONDAY',
-  //   TUESDAY: 'TUESDAY',
-  //   WEDNESSDAY: 'WEDNESSDAY',
-  //   THURSDAY: 'THURSDAY',
-  //   FRIDAY: 'FRIDAY',
-  //   SATURDAY: 'SATURDAY'
-  // };
-
   const ReminderSchema = mongoose.Schema({
-    name: String,
-    dateTime: Date
-    // event: { type: mongoose.Schema.Types.ObjectId, ref: 'EventModel' },
-    // course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
-    // repeats: [String],
-    // alerts: []
+    name: { type: String },
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
+    activities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ActivityModel'
+      }
+    ],
+    events: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'EventModel'
+      }
+    ]
   });
-
-  // ReminderSchema.virtual('RepeatMode').get(() => RepeatMode);
 
   return mongoose.model('ReminderModel', ReminderSchema);
 })();

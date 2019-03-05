@@ -4,11 +4,11 @@ module.exports = (() => {
   const EventSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
-    startDateTime: Date,
-    endDateTime: Date,
-    repeats: [String],
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
-    reminders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ReminderModel' }]
+    dateTime: Date,
+    subreminder: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubreminderModel'
+    }
   });
 
   return mongoose.model('EventModel', EventSchema);

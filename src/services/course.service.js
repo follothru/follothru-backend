@@ -2,6 +2,7 @@ module.exports = (() => {
   const mongoose = require('mongoose');
   const CourseModel = require('../models/course.model.js');
   const UserService = require('./user.service.js');
+  const ReminderService = require('./reminder.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
@@ -83,12 +84,29 @@ module.exports = (() => {
     });
   }
 
+  function createReminders(courseId, name, type, startDate, endDate, repeats) {
+    return ReminderService.createReminders(
+      courseId,
+      name,
+      type,
+      startDate,
+      endDate,
+      repeats
+    );
+  }
+
+  function getRemindersByCourseId(courseId) {
+    return ReminderService.getRemindersByCourseId(courseId);
+  }
+
   return {
     findAllCourses,
     findAllCoursesForCurrentUser,
     createCourse,
     findCourseById,
     modifyCourse,
-    deleteCourse
+    deleteCourse,
+    createReminders,
+    getRemindersByCourseId
   };
 })();
