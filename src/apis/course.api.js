@@ -8,15 +8,11 @@ module.exports = (() => {
     CourseService.findAllCoursesForCurrentUser(currentUser)
       .then(courses => {
         courses = courses.map(course => {
-          const id = course._id;
-          const name = course.name;
-          const description = course.description;
           const instructors = course.instructors.map(instructor => {
-            const instructorId = instructor._id;
             const { firstname, lastname, email } = instructor;
-            return { id: instructorId, firstname, lastname, email };
+            return { id: instructor._id, firstname, lastname, email };
           });
-          return { id, name, description, instructors };
+          return { id: course._id, name: course.name, instructors };
         });
         res.send(courses);
       })
@@ -35,7 +31,13 @@ module.exports = (() => {
         if (!course) {
           throw new Error('Could not find course');
         }
-        const { name, endDate, description } = course;
+        const {
+          name,
+          endDate,
+          description,
+          hasPlanningPrompt,
+          planningPrompt
+        } = course;
         let instructors = [];
         if (course.instructors) {
           instructors = course.instructors.map(instructor => {
@@ -53,7 +55,9 @@ module.exports = (() => {
           name,
           description,
           endDate,
-          instructors
+          instructors,
+          hasPlanningPrompt,
+          planningPrompt
         });
       })
       .catch(err => {
@@ -66,8 +70,21 @@ module.exports = (() => {
 
   router.put('/:id', SessionService.authenticateSession, (req, res) => {
     const id = req.params.id;
-    const { name, description, endDate } = req.body;
-    CourseService.modifyCourse(id, name, description, endDate)
+    const {
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    } = req.body;
+    CourseService.modifyCourse(
+      id,
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    )
       .then(result =>
         res.send({
           id: result._id,
@@ -170,9 +187,22 @@ module.exports = (() => {
   );
 
   router.post('/', SessionService.authenticateSession, (req, res) => {
-    const { name, description, endDate } = req.body;
+    const {
+      name,
+      description,
+      endDate,
+      hasPlanningPrompt,
+      planningPrompt
+    } = req.body;
     const instructors = [req.currentUser];
-    CourseService.createCourse(name, description, endDate, instructors)
+    CourseService.createCourse(
+      name,
+      description,
+      endDate,
+      instructors,
+      hasPlanningPrompt,
+      planningPrompt
+    )
       .then(result => {
         const id = result._id;
         res.send({

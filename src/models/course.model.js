@@ -7,6 +7,8 @@ module.exports = (() => {
     description: String,
     endDate: Date,
     approved: Boolean,
+    hasPlanningPrompt: Boolean,
+    planningPrompt: String,
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StudentModel' }]
   });
