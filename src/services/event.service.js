@@ -72,7 +72,8 @@ module.exports = (() => {
         return;
       }
       const subreminderIds = events
-        .map(event => event.subreminder)
+        .map(event => event.subreminders)
+        .reduce((prev, curr) => [...prev, curr], [])
         .map(subreminder => subreminder._id);
       const eventIds = events.map(event => event._id);
       Promise.all([

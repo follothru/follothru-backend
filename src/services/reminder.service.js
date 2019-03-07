@@ -78,7 +78,7 @@ module.exports = (() => {
             name,
             dateTime: model.dateTime
           });
-          model.subreminder = subreminder;
+          model.subreminders = [subreminder];
           subreminder.save();
           return model.save();
         });
@@ -172,13 +172,13 @@ module.exports = (() => {
       .populate({
         path: 'events',
         populate: {
-          path: 'subreminder'
+          path: 'subreminders'
         }
       })
       .populate({
         path: 'activities',
         populate: {
-          path: 'subreminder'
+          path: 'subreminders'
         }
       });
   }
@@ -188,13 +188,13 @@ module.exports = (() => {
       .populate({
         path: 'events',
         populate: {
-          path: 'subreminder'
+          path: 'subreminders'
         }
       })
       .populate({
         path: 'activities',
         populate: {
-          path: 'subreminder'
+          path: 'subreminders'
         }
       });
   }

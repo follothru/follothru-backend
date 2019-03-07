@@ -1,0 +1,19 @@
+const EventPopulator = require('./event.populator.js');
+const ActivityPopulator = require('./activity.populator.js');
+const EventsPopulator = require('./events.populator.js');
+const ActivitiesPopulator = require('./activities.populator.js');
+const SubreminderPopulator = require('./subreminder.populator.js');
+const ReminderPopulator = require('./reminder.populator.js');
+const RemindersPopulator = require('./reminders.populator.js');
+const SubremindersPopulator = require('./subreminders.populator.js');
+
+module.exports = {
+  EventPopulator,
+  ActivityPopulator,
+  EventsPopulator,
+  ActivitiesPopulator,
+  ReminderPopulator,
+  RemindersPopulator,
+  SubreminderPopulator,
+  SubremindersPopulator
+};
