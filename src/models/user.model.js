@@ -1,12 +1,8 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
+  const UserModelEnum = require('./user.model.enum.js');
 
-  const UserGroup = {
-    ANONYMOUS: 0,
-    INSTRUCTOR: 1,
-    ADMIN: 2,
-    SUPER_ADMIN: 3
-  };
+  const UserGroup = UserModelEnum.UserGroup;
 
   const UserSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
