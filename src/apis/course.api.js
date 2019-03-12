@@ -34,10 +34,6 @@ module.exports = (() => {
     }
   );
 
-  // ((req, res, next) => {
-  //   return user => SessionService.authenticateSession(req, res, next, user);
-  // })('admin');
-
   router.get(
     '/:id',
     userAuthenticatorFactory([
