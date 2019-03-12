@@ -1,12 +1,18 @@
 module.exports = (() => {
   const express = require('express');
-  const { SessionService, ReminderService } = require('../services');
+  const { ReminderService } = require('../services');
+  const { UserModelEnum } = require('../models');
+  const { AuthService } = require('../services');
+  const { userAuthenticatorFactory } = AuthService;
 
   const router = express.Router();
 
   router.delete(
     '/:reminderId',
-    SessionService.authenticateSession,
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
     (req, res) => {
       const { reminderId } = req.params;
       ReminderService.deleteReminderById(reminderId)

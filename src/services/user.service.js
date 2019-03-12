@@ -1,6 +1,6 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
-  const UserModel = require('../models/user.model.js');
+  const { UserModel, UserModelEnum } = require('../models');
   const ValidationUtils = require('../utils/validation.util.js');
 
   class DuplicatedUserError extends Error {}
@@ -85,7 +85,7 @@ module.exports = (() => {
 
   function isSuperAdmin(user) {
     return user
-      ? user.groups.some(group => group === user.UserGroup.SUPER_ADMIN)
+      ? user.groups.some(group => group === UserModelEnum.UserGroup.SUPER_ADMIN)
       : false;
   }
 
