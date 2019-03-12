@@ -15,26 +15,22 @@ module.exports = (() => {
     const dateStr = getDisplayDate(date);
     const monthStr = getDisplayMonth(date);
 
-    switch (format) {
-    case MONTH_ONLY:
+    if (format === MONTH_ONLY) {
       return monthStr;
-
-    case MONTH_SHORT_ONLY:
-      return monthStr.substr(0, 3);
-
-    case DAY_ONLY:
-      return dayStr;
-
-    case DAY_DATE:
-      return `${dayStr}, ${dateStr}`;
-
-    case DAY_DATE_SHORT:
-      return `${dateStr} (${dayStr.substr(0, 3)})`;
-
-    case DEFAULT:
-    default:
-      return `${dayStr}, ${dateStr} ${monthStr}`;
     }
+    if (format === MONTH_SHORT_ONLY) {
+      return monthStr.substr(0, 3);
+    }
+    if (format === DAY_ONLY) {
+      return dayStr;
+    }
+    if (format === DAY_DATE) {
+      return `${dayStr}, ${dateStr}`;
+    }
+    if (format === DAY_DATE_SHORT) {
+      return `${dateStr} (${dayStr.substr(0, 3)})`;
+    }
+    return `${dayStr}, ${dateStr} ${monthStr}`;
   }
 
   function getDisplayDay(date) {
@@ -70,7 +66,7 @@ module.exports = (() => {
 
   function getDisplayDate(date) {
     const suffixes = ['th', 'st', 'nd', 'rd'];
-    const dateNum = date.getDate() + 1;
+    const dateNum = date.getDate();
     return dateNum + (suffixes[dateNum % 10] ? suffixes[dateNum % 10] : 'th');
   }
 

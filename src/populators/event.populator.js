@@ -1,13 +1,14 @@
 module.exports = (() => {
   function populate(event) {
-    return event
-      ? {
-        id: event._id,
-        name: event.name,
-        type: event.type,
-        dateTime: event.dateTime
-      }
-      : null;
+    if (!event) {
+      return null;
+    }
+    return {
+      id: event._id,
+      name: event.name,
+      type: event.type,
+      dateTime: event.dateTime
+    };
   }
   return { populate };
 })();

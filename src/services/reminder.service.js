@@ -15,39 +15,35 @@ module.exports = (() => {
     courseId,
     name,
     type,
-    startDate,
-    endDate,
-    repeats = {}
+    startDateTime,
+    endDateTime,
+    repeats = [],
+    sendTime = []
   ) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(courseId, 'courseId');
         ValidationUtils.notNullOrEmpty(name, 'name');
         ValidationUtils.notNullOrEmpty(type, 'type');
-        ValidationUtils.notNullOrEmpty(startDate, 'startDate');
+        ValidationUtils.notNullOrEmpty(startDateTime, 'startDateTime');
 
-        if (!endDate) {
-          endDate = startDate;
+        if (!endDateTime) {
+          endDateTime = startDateTime;
         }
-        startDate = new Date(startDate);
-        endDate = new Date(endDate);
-        const { dayInterval, weekInterval, monthInterval } = repeats;
+        startDateTime = new Date(startDateTime);
+        endDateTime = new Date(endDateTime);
+
         const course = new mongoose.Types.ObjectId(courseId);
-        const dates = generateDates(startDate, endDate, {
-          dayInterval,
-          weekInterval,
-          monthInterval
-        });
+        const dates = generateDates(startDateTime, endDateTime, repeats);
 
         const reminder = new ReminderModel({
           name,
           course
         });
 
-        let reminderActions;
-
+        let reminders;
         if (type.toUpperCase() === 'ACTIVITY') {
-          reminderActions = dates.map(
+          reminders = dates.map(
             date =>
               new ActivityModel({
                 _id: new mongoose.Types.ObjectId(),
@@ -55,9 +51,9 @@ module.exports = (() => {
                 dateTime: date
               })
           );
-          reminder.activities = reminderActions.map(action => action._id);
+          reminder.activities = reminders.map(action => action._id);
         } else if (type.toUpperCase() === 'EVENT') {
-          reminderActions = dates.map(
+          reminders = dates.map(
             date =>
               new EventModel({
                 _id: new mongoose.Types.ObjectId(),
@@ -65,21 +61,25 @@ module.exports = (() => {
                 dateTime: date
               })
           );
-          reminder.events = reminderActions.map(action => action._id);
+          reminder.events = reminders.map(action => action._id);
         }
 
-        if (!reminderActions) {
+        if (!reminders) {
           reject(new Error('could not identify reminder type'));
           return;
         }
 
-        const promises = reminderActions.map(model => {
-          const subreminder = new SubreminderModel({
-            name,
-            dateTime: model.dateTime
-          });
-          model.subreminders = [subreminder];
-          subreminder.save();
+        const promises = reminders.map(model => {
+          const subreminders = dateOffsets(model.dateTime, sendTime).map(
+            date =>
+              new SubreminderModel({
+                name,
+                dateTime: date
+              })
+          );
+          subreminders.forEach(subreminder => subreminder.save());
+
+          model.subreminders = subreminders;
           return model.save();
         });
 
@@ -97,54 +97,79 @@ module.exports = (() => {
     });
   }
 
-  function generateDates(startDate, endDate, options = {}) {
-    if (endDate.getTime() < startDate.getTime()) {
+  function dateOffsets(date, options = []) {
+    if (!date) {
+      return null;
+    }
+    if (!options || options.length <= 0) {
+      return [date];
+    }
+    const results = options
+      .filter(option => option.value !== 0)
+      .map(option => {
+        const { name, value } = option;
+        const result = new Date(date.getTime());
+        if (name === 'hourAdvance') {
+          result.setHour(result.getHours() - value);
+        }
+        if (name === 'dayAdvance') {
+          result.setDate(result.getDate() - value);
+        }
+        if (name === 'weekAdvance') {
+          result.setDate(result.getDate() - 7 * value);
+        }
+        if (name === 'monthAdvance') {
+          result.setMonth(result.getMonth() - value);
+        }
+        return result;
+      });
+
+    return results;
+  }
+
+  function generateDates(startDateTime, endDateTime, options = []) {
+    if (endDateTime.getTime() < startDateTime.getTime() || !options) {
       return [];
     }
-    const { dayInterval, weekInterval, monthInterval } = options;
-    if (
-      dayInterval === undefined &&
-      weekInterval === undefined &&
-      monthInterval === undefined
-    ) {
-      return [startDate];
-    }
+
     const minInterval = 86400000; // 1000 * 3600 * 24
     const dates = Object.keys([
       ...new Array(
-        Math.ceil((endDate.getTime() - startDate.getTime()) / minInterval) + 1
+        Math.ceil(
+          (endDateTime.getTime() - startDateTime.getTime()) / minInterval
+        ) + 1
       )
     ])
-      .map(daysDiff => {
+      .map(dayInterval => {
         return {
-          date: new Date(daysDiff * minInterval + startDate.getTime()),
-          daysDiff: daysDiff - 0
+          date: new Date(dayInterval * minInterval + startDateTime.getTime()),
+          dayInterval: dayInterval - 0
         };
       })
       .map(obj => {
-        const { date, daysDiff } = obj;
+        const { date, dayInterval } = obj;
         return {
           date,
-          daysDiff,
-          weeksDiff: Math.floor(daysDiff / 7),
-          monthsDiff:
-            (date.getFullYear() - startDate.getFullYear()) * 12 +
+          dayInterval,
+          weekInterval: Math.floor(dayInterval / 7),
+          monthInterval:
+            (date.getFullYear() - startDateTime.getFullYear()) * 12 +
             date.getMonth() -
-            startDate.getMonth() +
-            (date.getDate() < startDate.getDate() ? -1 : 0)
+            startDateTime.getMonth() +
+            (date.getDate() < startDateTime.getDate() ? -1 : 0)
         };
       });
 
-    const intvMap = {};
-    if (dayInterval) {
-      intvMap['daysDiff'] = dayInterval;
-    }
-    if (weekInterval) {
-      intvMap['weeksDiff'] = weekInterval;
-    }
-    if (monthInterval) {
-      intvMap['monthsDiff'] = monthInterval;
-    }
+    const intvMap = options.reduce((prev, curr) => {
+      const key = curr.name;
+      const val = curr.value;
+      if (!prev[key]) {
+        prev[key] = [];
+      }
+      prev[key].push(val);
+      return prev;
+    }, {});
+
     const intvKeys = Object.keys(intvMap);
 
     const results = dates
@@ -155,7 +180,9 @@ module.exports = (() => {
         }
         if (
           intvKeys.some(
-            key => last[key] !== curr[key] && curr[key] % intvMap[key] === 0
+            key =>
+              last[key] !== curr[key] &&
+              intvMap[key].some(intv => curr[key] % intv === 0)
           )
         ) {
           return [...prev, curr];

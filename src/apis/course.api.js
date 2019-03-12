@@ -125,14 +125,22 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      const { name, startDate, endDate, repeats, type } = req.body;
+      const {
+        name,
+        startDateTime,
+        endDateTime,
+        repeats,
+        sendTime,
+        type
+      } = req.body;
       CourseService.createReminders(
         courseId,
         name,
         type,
-        startDate,
-        endDate,
-        repeats
+        startDateTime,
+        endDateTime,
+        repeats,
+        sendTime
       )
         .then(reminder => {
           res.send({
