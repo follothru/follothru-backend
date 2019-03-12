@@ -1,6 +1,7 @@
 module.exports = (() => {
   const express = require('express');
   const { CourseService, SessionService } = require('../services');
+  const { RemindersPopulator } = require('../populators');
   const router = express.Router();
 
   router.get('/', SessionService.authenticateSession, (req, res) => {
@@ -106,49 +107,10 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
+
       CourseService.getRemindersByCourseId(courseId)
-        .then(results => {
-          results = results.map(result => {
-            const { name, events, activities } = result;
-            return {
-              id: result._id,
-              name,
-              events: events.map(event => {
-                let subreminder = null;
-                if (event.subreminder) {
-                  subreminder = {
-                    id: event.subreminder._id,
-                    name: event.subreminder.name,
-                    dateTime: event.subreminder.dateTime
-                  };
-                }
-                return {
-                  id: event._id,
-                  name: event.name,
-                  dateTime: event.dateTime,
-                  subreminder: subreminder
-                };
-              }),
-              activities: activities.map(activity => {
-                let subreminder = null;
-                if (activity.subreminder) {
-                  subreminder = {
-                    id: activity.subreminder._id,
-                    name: activity.subreminder.name,
-                    dateTime: activity.subreminder.dateTime
-                  };
-                }
-                return {
-                  id: activity._id,
-                  name: activity.name,
-                  dateTime: activity.dateTime,
-                  subreminder
-                };
-              })
-            };
-          });
-          res.send(results);
-        })
+        .then(reminders => RemindersPopulator.populate(reminders))
+        .then(result => res.send(result))
         .catch(err => {
           console.error(err);
           res.status(500).send({
@@ -163,14 +125,22 @@ module.exports = (() => {
     SessionService.authenticateSession,
     (req, res) => {
       const { courseId } = req.params;
-      const { name, startDate, endDate, repeats, type } = req.body;
+      const {
+        name,
+        startDateTime,
+        endDateTime,
+        repeats,
+        sendTime,
+        type
+      } = req.body;
       CourseService.createReminders(
         courseId,
         name,
         type,
-        startDate,
-        endDate,
-        repeats
+        startDateTime,
+        endDateTime,
+        repeats,
+        sendTime
       )
         .then(reminder => {
           res.send({

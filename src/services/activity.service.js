@@ -72,8 +72,8 @@ module.exports = (() => {
         return;
       }
       const subreminderIds = activities
-        .map(activity => activity.subreminder)
-        .map(subreminder => subreminder._id);
+        .map(activity => activity.subreminders)
+        .reduce((prev, curr) => [...prev, curr._id], []);
       const activityIds = activities.map(activity => activity._id);
 
       Promise.all([

@@ -107,14 +107,23 @@ module.exports = (() => {
     });
   }
 
-  function createReminders(courseId, name, type, startDate, endDate, repeats) {
+  function createReminders(
+    courseId,
+    name,
+    type,
+    startDateTime,
+    endDateTime,
+    repeats,
+    sendTime
+  ) {
     return ReminderService.createReminders(
       courseId,
       name,
       type,
-      startDate,
-      endDate,
-      repeats
+      startDateTime,
+      endDateTime,
+      repeats,
+      sendTime
     );
   }
 
