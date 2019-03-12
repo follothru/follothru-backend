@@ -1,7 +1,7 @@
 module.exports = (() => {
   const express = require('express');
   const router = express.Router();
-  const { CourseService, SessionService, AuthService } = require('../services');
+  const { CourseService, AuthService } = require('../services');
   const { UserModelEnum } = require('../models');
   const { RemindersPopulator } = require('../populators');
   const { userAuthenticatorFactory } = AuthService;
