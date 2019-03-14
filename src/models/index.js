@@ -6,9 +6,11 @@ const SubreminderModel = require('./subreminder.model.js');
 const StudentModel = require('./student.model.js');
 const EventModel = require('./event.model.js');
 const ActivityModel = require('./activity.model.js');
+const UserModelEnum = require('./user.model.enum.js');
 
 module.exports = {
   UserModel,
+  UserModelEnum,
   SessionModel,
   CourseModel,
   ReminderModel,

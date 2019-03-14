@@ -48,15 +48,14 @@ module.exports = (() => {
     });
   }
 
-  function authenticateSession(req, res, next) {
+  function authenticateSession(req, res) {
     const { authorization } = req.headers;
-
-    validateUserSession(authorization)
-      .then(result => {
-        req.currentUser = result.user;
-        next();
-      })
-      .catch(() => res.status(403).send());
+    return validateUserSession(authorization)
+      .then(result => result.user)
+      .catch(() => {
+        const error = 'failed to authenticate session';
+        res.status(403).send({ error });
+      });
   }
 
   return { createUserSession, validateUserSession, authenticateSession };
