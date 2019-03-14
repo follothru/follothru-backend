@@ -4,6 +4,7 @@ module.exports = (() => {
   const EventPopulator = require('./event.populator.js');
   const SubremindersPopulator = require('./subreminders.populator.js');
   const SubreminderCategoriesPopulater = require('./subreminder-categories.populator.js');
+  const CoursePopulator = require('./course.populator.js');
 
   function populate(reminder) {
     if (!reminder) {
@@ -26,19 +27,21 @@ module.exports = (() => {
 
     const subreminders = [...eventSubreminders, ...activitySubreminders];
     const categories = SubreminderCategoriesPopulater.populate(subreminders);
-    const upcommingDisplay = populateUpcommingDisplay(subreminders);
+    const upcomingDisplay = populateUpcomingDisplay(subreminders);
+    const course = CoursePopulator.populate(reminder.course);
 
     return {
       id: reminder._id,
       name: reminder.name,
       subreminders,
       categories,
-      upcommingDisplay
+      upcomingDisplay,
+      course
     };
   }
 
-  function populateUpcommingDisplay(subreminders) {
-    const upcommingDates = {};
+  function populateUpcomingDisplay(subreminders) {
+    const upcomingDates = {};
     subreminders
       .slice(0, 4)
       .map(subreminder => subreminder.dateTime)
@@ -47,10 +50,10 @@ module.exports = (() => {
           dateTime,
           DisplayDatePopulator.formats.MONTH_SHORT_ONLY
         );
-        if (!upcommingDates[monthStr]) {
-          upcommingDates[monthStr] = [];
+        if (!upcomingDates[monthStr]) {
+          upcomingDates[monthStr] = [];
         }
-        upcommingDates[monthStr].push(
+        upcomingDates[monthStr].push(
           DisplayDatePopulator.populate(
             dateTime,
             DisplayDatePopulator.formats.DAY_DATE_SHORT
@@ -58,10 +61,10 @@ module.exports = (() => {
         );
       });
 
-    const upcommingDisplay = Object.keys(upcommingDates)
-      .map(monthStr => `${monthStr}: ${upcommingDates[monthStr].join(', ')}`)
+    const upcomingDisplay = Object.keys(upcomingDates)
+      .map(monthStr => `${monthStr}: ${upcomingDates[monthStr].join(', ')}`)
       .join('; ');
-    return upcommingDisplay;
+    return upcomingDisplay;
   }
 
   return { populate };
