@@ -207,7 +207,8 @@ module.exports = (() => {
         populate: {
           path: 'subreminders'
         }
-      });
+      })
+      .populate('course');
   }
 
   function getRemindersByCourseId(courseId) {
@@ -223,7 +224,8 @@ module.exports = (() => {
         populate: {
           path: 'subreminders'
         }
-      });
+      })
+      .populate('course');
   }
 
   function deleteRemindersByCourseId(courseId) {
@@ -291,11 +293,55 @@ module.exports = (() => {
     });
   }
 
+  function findReminderForCourses(courses) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(courses, 'courses');
+        const courseIds = courses.map(course => course._id);
+        ReminderModel.find({ course: { $in: courseIds } })
+          .populate({
+            path: 'events',
+            populate: {
+              path: 'subreminders'
+            }
+          })
+          .populate({
+            path: 'activities',
+            populate: {
+              path: 'subreminders'
+            }
+          })
+          .populate('course')
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function getUpcomingReminders(user) {
+    const CourseService = require('./course.service.js');
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(user, 'user');
+        CourseService.findAllCoursesForUser(user)
+          .then(findReminderForCourses)
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   return {
     findAll,
     deleteReminderById,
     deleteRemindersByCourseId,
     getRemindersByCourseId,
-    createReminders
+    createReminders,
+    getUpcomingReminders,
+    findReminderForCourses
   };
 })();

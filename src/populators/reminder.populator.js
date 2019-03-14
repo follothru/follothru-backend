@@ -4,6 +4,7 @@ module.exports = (() => {
   const EventPopulator = require('./event.populator.js');
   const SubremindersPopulator = require('./subreminders.populator.js');
   const SubreminderCategoriesPopulater = require('./subreminder-categories.populator.js');
+  const CoursePopulator = require('./course.populator.js');
 
   function populate(reminder) {
     if (!reminder) {
@@ -27,13 +28,15 @@ module.exports = (() => {
     const subreminders = [...eventSubreminders, ...activitySubreminders];
     const categories = SubreminderCategoriesPopulater.populate(subreminders);
     const upcommingDisplay = populateUpcommingDisplay(subreminders);
+    const course = CoursePopulator.populate(reminder.course);
 
     return {
       id: reminder._id,
       name: reminder.name,
       subreminders,
       categories,
-      upcommingDisplay
+      upcommingDisplay,
+      course
     };
   }
 

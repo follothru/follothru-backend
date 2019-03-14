@@ -9,13 +9,11 @@ module.exports = (() => {
     return CourseModel.find().populate('instructors');
   }
 
-  function findAllCoursesForCurrentUser(currentUser) {
-    if (UserService.isSuperAdmin(currentUser)) {
+  function findAllCoursesForUser(user) {
+    if (UserService.isSuperAdmin(user)) {
       return findAllCourses();
     }
-    return CourseModel.find({ instructors: currentUser }).populate(
-      'instructors'
-    );
+    return CourseModel.find({ instructors: user }).populate('instructors');
   }
 
   function findCourseById(id) {
@@ -133,7 +131,7 @@ module.exports = (() => {
 
   return {
     findAllCourses,
-    findAllCoursesForCurrentUser,
+    findAllCoursesForUser,
     createCourse,
     findCourseById,
     modifyCourse,

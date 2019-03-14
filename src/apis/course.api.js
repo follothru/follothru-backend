@@ -5,6 +5,7 @@ module.exports = (() => {
   const { UserModelEnum } = require('../models');
   const { RemindersPopulator } = require('../populators');
   const { userAuthenticatorFactory } = AuthService;
+  const { CoursesPopulator } = require('../populators');
 
   router.get(
     '/',
@@ -14,17 +15,8 @@ module.exports = (() => {
     ]),
     (req, res) => {
       const { currentUser } = req;
-      CourseService.findAllCoursesForCurrentUser(currentUser)
-        .then(courses => {
-          courses = courses.map(course => {
-            const instructors = course.instructors.map(instructor => {
-              const { firstname, lastname, email } = instructor;
-              return { id: instructor._id, firstname, lastname, email };
-            });
-            return { id: course._id, name: course.name, instructors };
-          });
-          res.send(courses);
-        })
+      CourseService.findAllCoursesForUser(currentUser)
+        .then(courses => res.send(CoursesPopulator.populate(courses)))
         .catch(err => {
           console.error(err);
           res.status(500).send({

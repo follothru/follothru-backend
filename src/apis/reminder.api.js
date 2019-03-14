@@ -4,8 +4,25 @@ module.exports = (() => {
   const { UserModelEnum } = require('../models');
   const { AuthService } = require('../services');
   const { userAuthenticatorFactory } = AuthService;
+  const { RemindersPopulator } = require('../populators');
 
   const router = express.Router();
+
+  router.get(
+    '/',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {
+      ReminderService.getUpcomingReminders(req.currentUser)
+        .then(reminders => res.send(RemindersPopulator.populate(reminders)))
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({ error: err.message });
+        });
+    }
+  );
 
   router.delete(
     '/:reminderId',
