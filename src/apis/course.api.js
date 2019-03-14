@@ -79,7 +79,10 @@ module.exports = (() => {
 
   router.put(
     '/:id',
-    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.ADMIN,
+      UserModelEnum.UserGroup.INSTRUCTOR
+    ]),
     (req, res) => {
       const id = req.params.id;
       const {
