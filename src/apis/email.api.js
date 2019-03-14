@@ -3,7 +3,6 @@ module.exports = (() => {
   const router = express.Router();
 
   const { EmailService } = require('../services');
-  const { EmailPopulator } = require('../populators');
 
   router.get('/', (req, res) => {
     EmailService.getAllEmail()
