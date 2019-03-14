@@ -3,6 +3,7 @@ module.exports = (() => {
   const ActivityPopulator = require('./activity.populator.js');
   const EventPopulator = require('./event.populator.js');
   const SubremindersPopulator = require('./subreminders.populator.js');
+  const SubreminderCategoriesPopulater = require('./subreminder-categories.populator.js');
 
   function populate(reminder) {
     if (!reminder) {
@@ -11,22 +12,20 @@ module.exports = (() => {
 
     const eventSubreminders = reminder.events.reduce((prev, curr) => {
       const event = EventPopulator.populate(curr);
-      return [
-        ...prev,
-        ...SubremindersPopulator.populate(curr.subreminders, event)
-      ];
+      return prev.concat(
+        SubremindersPopulator.populate(curr.subreminders, event)
+      );
     }, []);
 
     const activitySubreminders = reminder.activities.reduce((prev, curr) => {
       const activity = ActivityPopulator.populate(curr);
-      return [
-        ...prev,
-        ...SubremindersPopulator.populate(curr.subreminders, activity)
-      ];
+      return prev.concat(
+        SubremindersPopulator.populate(curr.subreminders, activity)
+      );
     }, []);
 
     const subreminders = [...eventSubreminders, ...activitySubreminders];
-    const categories = populateCategories(subreminders);
+    const categories = SubreminderCategoriesPopulater.populate(subreminders);
     const upcommingDisplay = populateUpcommingDisplay(subreminders);
 
     return {
@@ -36,39 +35,6 @@ module.exports = (() => {
       categories,
       upcommingDisplay
     };
-  }
-
-  function populateCategories(subreminders = []) {
-    const catMap = subreminders.reduce((prev, curr) => {
-      const monthStr = DisplayDatePopulator.populate(
-        curr.dateTime,
-        DisplayDatePopulator.formats.MONTH_ONLY
-      );
-      const dayStr = DisplayDatePopulator.populate(
-        curr.dateTime,
-        DisplayDatePopulator.formats.DAY_DATE
-      );
-      if (!prev[monthStr]) {
-        prev[monthStr] = {};
-      }
-      if (!prev[monthStr][dayStr]) {
-        prev[monthStr][dayStr] = [];
-      }
-      prev[monthStr][dayStr].push(curr);
-      return prev;
-    }, {});
-    return Object.keys(catMap).map(month => {
-      const result = Object.keys(catMap[month]).map(day => {
-        return {
-          category: day,
-          content: catMap[month][day]
-        };
-      });
-      return {
-        category: month,
-        content: result
-      };
-    });
   }
 
   function populateUpcommingDisplay(subreminders) {

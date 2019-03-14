@@ -6,6 +6,7 @@ const SubreminderPopulator = require('./subreminder.populator.js');
 const ReminderPopulator = require('./reminder.populator.js');
 const RemindersPopulator = require('./reminders.populator.js');
 const SubremindersPopulator = require('./subreminders.populator.js');
+const SubreminderCategoriesPopulator = require('./subreminder-categories.populator.js');
 
 module.exports = {
   EventPopulator,
@@ -15,5 +16,6 @@ module.exports = {
   ReminderPopulator,
   RemindersPopulator,
   SubreminderPopulator,
-  SubremindersPopulator
+  SubremindersPopulator,
+  SubreminderCategoriesPopulator
 };
