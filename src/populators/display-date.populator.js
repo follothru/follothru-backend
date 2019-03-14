@@ -5,6 +5,7 @@ module.exports = (() => {
   const DAY_ONLY = 3;
   const DAY_DATE = 4;
   const DAY_DATE_SHORT = 5;
+  const FULL_YEAR_ONLY = 6;
 
   function populate(date, format = DEFAULT) {
     if (!date) {
@@ -29,6 +30,9 @@ module.exports = (() => {
     }
     if (format === DAY_DATE_SHORT) {
       return `${dateStr} (${dayStr.substr(0, 3)})`;
+    }
+    if (format === FULL_YEAR_ONLY) {
+      return `${date.getFullYear()}`;
     }
     return `${dayStr}, ${dateStr} ${monthStr}`;
   }
@@ -78,7 +82,8 @@ module.exports = (() => {
       MONTH_SHORT_ONLY,
       DAY_ONLY,
       DAY_DATE,
-      DAY_DATE_SHORT
+      DAY_DATE_SHORT,
+      FULL_YEAR_ONLY
     }
   };
 })();
