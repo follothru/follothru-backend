@@ -4,8 +4,13 @@ module.exports = (() => {
 
   const { EmailService } = require('../services');
 
+  const { EmailPopulator } = require('../populators');
+
   router.get('/', (req, res) => {
     EmailService.getAllEmail()
+      .then(results => {
+        return results.map(result => EmailPopulator.populate(result));
+      })
       .then(result => {
         res.send(result);
       })
