@@ -7,6 +7,9 @@ const StudentModel = require('./student.model.js');
 const EventModel = require('./event.model.js');
 const ActivityModel = require('./activity.model.js');
 const UserModelEnum = require('./user.model.enum.js');
+const EmailModel = require('./email.model.js');
+const EmailComponentModel = require('./email-component.model.js');
+const EmailComponentEnum = require('./email-component.enum.js');
 
 module.exports = {
   UserModel,
@@ -17,5 +20,8 @@ module.exports = {
   SubreminderModel,
   StudentModel,
   EventModel,
-  ActivityModel
+  ActivityModel,
+  EmailModel,
+  EmailComponentModel,
+  EmailComponentEnum
 };
