@@ -195,37 +195,29 @@ module.exports = (() => {
   }
 
   function getRemindersById(id) {
-    return ReminderModel.findOne({ _id: new mongoose.Types.ObjectId(id) })
-      .populate({
-        path: 'events',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate({
-        path: 'activities',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate('course');
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(id, 'id');
+        getReminder({ _id: new mongoose.Types.ObjectId(id) })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   function getRemindersByCourseId(courseId) {
-    return ReminderModel.find({ course: new mongoose.Types.ObjectId(courseId) })
-      .populate({
-        path: 'events',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate({
-        path: 'activities',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate('course');
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        getReminders({ course: new mongoose.Types.ObjectId(courseId) })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   function deleteRemindersByCourseId(courseId) {
@@ -298,20 +290,7 @@ module.exports = (() => {
       try {
         ValidationUtils.notNullOrEmpty(courses, 'courses');
         const courseIds = courses.map(course => course._id);
-        ReminderModel.find({ course: { $in: courseIds } })
-          .populate({
-            path: 'events',
-            populate: {
-              path: 'subreminders'
-            }
-          })
-          .populate({
-            path: 'activities',
-            populate: {
-              path: 'subreminders'
-            }
-          })
-          .populate('course')
+        getReminders({ course: { $in: courseIds } })
           .then(resolve)
           .catch(reject);
       } catch (err) {
@@ -333,6 +312,40 @@ module.exports = (() => {
         reject(err);
       }
     });
+  }
+
+  function getReminder(conditions) {
+    return ReminderModel.findOne(conditions)
+      .populate({
+        path: 'events',
+        populate: {
+          path: 'subreminders'
+        }
+      })
+      .populate({
+        path: 'activities',
+        populate: {
+          path: 'subreminders'
+        }
+      })
+      .populate('course');
+  }
+
+  function getReminders(conditions) {
+    return ReminderModel.find(conditions)
+      .populate({
+        path: 'events',
+        populate: {
+          path: 'subreminders'
+        }
+      })
+      .populate({
+        path: 'activities',
+        populate: {
+          path: 'subreminders'
+        }
+      })
+      .populate('course');
   }
 
   return {

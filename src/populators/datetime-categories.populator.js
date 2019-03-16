@@ -1,8 +1,8 @@
 module.exports = (() => {
   const DisplayDatePopulator = require('./display-date.populator.js');
 
-  function populate(subreminders) {
-    const catMap = subreminders.reduce((prev, curr) => {
+  function populate(objects, entityPopulator) {
+    const catMap = objects.reduce((prev, curr) => {
       const { dateTime } = curr;
       const year = `${dateTime.getFullYear()}`;
       const month = `${dateTime.getMonth()}`;
@@ -20,10 +20,16 @@ module.exports = (() => {
         DisplayDatePopulator.formats.DAY_DATE
       );
       if (!prev[year]) {
-        prev[year] = { display: yearStr, content: {} };
+        prev[year] = {
+          display: yearStr,
+          content: {}
+        };
       }
       if (!prev[year].content[month]) {
-        prev[year].content[month] = { display: monthStr, content: {} };
+        prev[year].content[month] = {
+          display: monthStr,
+          content: {}
+        };
       }
       if (!prev[year].content[month].content[date]) {
         prev[year].content[month].content[date] = {
@@ -31,7 +37,9 @@ module.exports = (() => {
           content: []
         };
       }
-      prev[year].content[month].content[date].content.push(curr);
+      prev[year].content[month].content[date].content.push(
+        entityPopulator ? entityPopulator.populate(curr) : curr
+      );
       return prev;
     }, {});
     return catMap;

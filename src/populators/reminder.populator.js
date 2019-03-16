@@ -1,9 +1,8 @@
 module.exports = (() => {
   const DisplayDatePopulator = require('./display-date.populator.js');
-  const ActivityPopulator = require('./activity.populator.js');
-  const EventPopulator = require('./event.populator.js');
   const SubremindersPopulator = require('./subreminders.populator.js');
-  const SubreminderCategoriesPopulater = require('./subreminder-categories.populator.js');
+  const SubreminderPopulator = require('./subreminder.populator.js');
+  const DateTimeCategoriesPopulater = require('./datetime-categories.populator.js');
   const CoursePopulator = require('./course.populator.js');
 
   function populate(reminder) {
@@ -12,28 +11,26 @@ module.exports = (() => {
     }
 
     const eventSubreminders = reminder.events.reduce((prev, curr) => {
-      const event = EventPopulator.populate(curr);
-      return prev.concat(
-        SubremindersPopulator.populate(curr.subreminders, event)
-      );
+      return prev.concat(curr.subreminders);
     }, []);
 
     const activitySubreminders = reminder.activities.reduce((prev, curr) => {
-      const activity = ActivityPopulator.populate(curr);
-      return prev.concat(
-        SubremindersPopulator.populate(curr.subreminders, activity)
-      );
+      return prev.concat(curr.subreminders);
     }, []);
 
-    const subreminders = [...eventSubreminders, ...activitySubreminders];
-    const categories = SubreminderCategoriesPopulater.populate(subreminders);
+    const subreminders = eventSubreminders.concat(activitySubreminders);
+    const categories = DateTimeCategoriesPopulater.populate(
+      subreminders,
+      SubreminderPopulator
+    );
+    const subreminderResults = SubremindersPopulator.populate(subreminders);
     const upcomingDisplay = populateUpcomingDisplay(subreminders);
     const course = CoursePopulator.populate(reminder.course);
 
     return {
       id: reminder._id,
       name: reminder.name,
-      subreminders,
+      subreminders: subreminderResults,
       categories,
       upcomingDisplay,
       course
