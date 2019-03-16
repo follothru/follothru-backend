@@ -8,6 +8,8 @@ module.exports = (() => {
       id: subreminder._id,
       name: subreminder.name,
       dateTime: subreminder.dateTime,
+      parentReminder: subreminder.parentReminder,
+      type: 'reminder',
       for: forObj
     };
   }
