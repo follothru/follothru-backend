@@ -3,6 +3,7 @@ module.exports = (() => {
   const CourseModel = require('../models/course.model.js');
   const UserService = require('./user.service.js');
   const ReminderService = require('./reminder.service.js');
+  const StudentService = require('./student.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
 
   function findAllCourses() {
@@ -19,6 +20,7 @@ module.exports = (() => {
   function findCourseById(id) {
     return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) })
       .populate('instructors')
+      .populate('students')
       .then(courses => courses[0]);
   }
 
@@ -129,6 +131,35 @@ module.exports = (() => {
     return ReminderService.getRemindersByCourseId(courseId);
   }
 
+  function getStudentsEnrolled(courseId) {
+    return new Promise((resolve, reject) => {
+      const id = new mongoose.Types.ObjectId(courseId);
+      CourseModel.findOne({ _id: id })
+        .populate('students')
+        .then(course => course.students)
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  function addNewStudent(courseId, newStudent) {
+    return CourseModel.updateOne(
+      { _id: courseId },
+      { $push: { students: newStudent } }
+    );
+  }
+
+  function studentEnroll(courseId, prefName, email) {
+    return new Promise((resolve, reject) => {
+      StudentService.createNewStudent(prefName, email)
+        .then(newStudent =>
+          addNewStudent(new mongoose.Types.ObjectId(courseId), newStudent)
+        )
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
   return {
     findAllCourses,
     findAllCoursesForUser,
@@ -137,6 +168,8 @@ module.exports = (() => {
     modifyCourse,
     deleteCourse,
     createReminders,
-    getRemindersByCourseId
+    getRemindersByCourseId,
+    studentEnroll,
+    getStudentsEnrolled
   };
 })();

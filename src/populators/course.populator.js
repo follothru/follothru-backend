@@ -8,7 +8,12 @@ module.exports = (() => {
     const instructors = course.instructors.map(instructor =>
       InstructorPopulator.populate(instructor)
     );
-    return { id: course._id, name: course.name, instructors };
+    return {
+      id: course._id,
+      name: course.name,
+      studentsCount: course.students.length,
+      instructors
+    };
   }
 
   return { populate };

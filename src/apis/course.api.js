@@ -5,7 +5,11 @@ module.exports = (() => {
   const { UserModelEnum } = require('../models');
   const { RemindersPopulator } = require('../populators');
   const { userAuthenticatorFactory } = AuthService;
-  const { CoursesPopulator } = require('../populators');
+  const {
+    CoursePopulator,
+    CoursesPopulator,
+    StudentsPopulator
+  } = require('../populators');
 
   router.get(
     '/',
@@ -39,34 +43,7 @@ module.exports = (() => {
           if (!course) {
             throw new Error('Could not find course');
           }
-          const {
-            name,
-            endDate,
-            description,
-            hasPlanningPrompt,
-            planningPrompt
-          } = course;
-          let instructors = [];
-          if (course.instructors) {
-            instructors = course.instructors.map(instructor => {
-              const { firstname, lastname, email } = instructor;
-              return {
-                id: instructor._id,
-                firstname,
-                lastname,
-                email
-              };
-            });
-          }
-          res.send({
-            id,
-            name,
-            description,
-            endDate,
-            instructors,
-            hasPlanningPrompt,
-            planningPrompt
-          });
+          res.send(CoursePopulator.populate(course));
         })
         .catch(err => {
           console.error(err);
@@ -79,7 +56,10 @@ module.exports = (() => {
 
   router.put(
     '/:id',
-    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.ADMIN,
+      UserModelEnum.UserGroup.INSTRUCTOR
+    ]),
     (req, res) => {
       const id = req.params.id;
       const {
@@ -242,6 +222,38 @@ module.exports = (() => {
         });
     }
   );
+
+  router.get(
+    '/:courseId/student',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.ADMIN,
+      UserModelEnum.UserGroup.INSTRUCTOR
+    ]),
+    (req, res) => {
+      const { courseId } = req.params;
+      CourseService.getStudentsEnrolled(courseId)
+        .then(result => res.send(StudentsPopulator.populate(result)))
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({
+            error: err.message
+          });
+        });
+    }
+  );
+
+  router.post('/:courseId/student', (req, res) => {
+    const { courseId } = req.params;
+    const { prefName, email } = req.body;
+    CourseService.studentEnroll(courseId, prefName, email)
+      .then(() => res.send({ message: 'Success' }))
+      .catch(err => {
+        console.error(err);
+        res.status(500).send({
+          error: err.message
+        });
+      });
+  });
 
   return router;
 })();

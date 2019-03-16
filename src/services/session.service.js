@@ -39,11 +39,9 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       const creationTime = new Date();
       const _id = new mongoose.Types.ObjectId();
-
-      SessionModel.deleteMany({ user })
-        .then(() => {
-          resolve(new SessionModel({ _id, user, creationTime }).save());
-        })
+      new SessionModel({ _id, user, creationTime })
+        .save()
+        .then(resolve)
         .catch(reject);
     });
   }

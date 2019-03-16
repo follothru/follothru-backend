@@ -7,14 +7,13 @@ module.exports = (() => {
     return StudentModel.find().populate('courses');
   }
 
-  function createNewStudent(prefName, email, courseIds) {
+  function createNewStudent(prefName, email) {
     return new Promise((resolve, reject) => {
       try {
-        ValidationUtils.notNullOrEmpty(prefName);
-        ValidationUtils.notNullOrEmpty(email);
+        ValidationUtils.notNullOrEmpty(prefName, 'prefer name');
+        ValidationUtils.notNullOrEmpty(email, 'email');
         const _id = new mongoose.Types.ObjectId();
-        const courses = courseIds.map(id => new mongoose.Types.ObjectId(id));
-        const newStudent = new StudentModel({ _id, prefName, email, courses });
+        const newStudent = new StudentModel({ _id, prefName, email });
         newStudent
           .save()
           .then(resolve)
