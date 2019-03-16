@@ -6,6 +6,8 @@ const StudentService = require('./student.service.js');
 const EventService = require('./event.service.js');
 const ActivityService = require('./activity.service.js');
 const AuthService = require('./auth.service.js');
+const EmailService = require('./email.service.js');
+const EmailComponentService = require('./email-component.service.js');
 
 module.exports = {
   ReminderService,
@@ -15,5 +17,7 @@ module.exports = {
   StudentService,
   EventService,
   ActivityService,
-  AuthService
+  AuthService,
+  EmailService,
+  EmailComponentService
 };
