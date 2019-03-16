@@ -10,13 +10,15 @@ module.exports = (() => {
       return null;
     }
 
-    const eventSubreminders = reminder.events.reduce((prev, curr) => {
-      return prev.concat(curr.subreminders);
-    }, []);
+    const eventSubreminders = reminder.events.reduce(
+      (prev, curr) => prev.concat(curr.subreminders),
+      []
+    );
 
-    const activitySubreminders = reminder.activities.reduce((prev, curr) => {
-      return prev.concat(curr.subreminders);
-    }, []);
+    const activitySubreminders = reminder.activities.reduce(
+      (prev, curr) => prev.concat(curr.subreminders),
+      []
+    );
 
     const subreminders = eventSubreminders.concat(activitySubreminders);
     const categories = DateTimeCategoriesPopulater.populate(
@@ -42,6 +44,7 @@ module.exports = (() => {
     subreminders
       .slice(0, 4)
       .map(subreminder => subreminder.dateTime)
+      .sort((a, b) => a.getTime() - b.getTime())
       .forEach(dateTime => {
         const monthStr = DisplayDatePopulator.populate(
           dateTime,

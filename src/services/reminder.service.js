@@ -111,15 +111,19 @@ module.exports = (() => {
         const result = new Date(date.getTime());
         if (name === 'hourAdvance') {
           result.setHours(result.getHours() - value);
+          return result;
         }
         if (name === 'dayAdvance') {
           result.setDate(result.getDate() - value);
+          return result;
         }
         if (name === 'weekAdvance') {
           result.setDate(result.getDate() - 7 * value);
+          return result;
         }
         if (name === 'monthAdvance') {
           result.setMonth(result.getMonth() - value);
+          return result;
         }
         return result;
       });
