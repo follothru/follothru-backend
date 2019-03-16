@@ -205,7 +205,10 @@ module.exports = (() => {
 
   router.delete(
     '/:courseId',
-    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
     (req, res) => {
       const { courseId } = req.params;
       CourseService.deleteCourse(courseId)

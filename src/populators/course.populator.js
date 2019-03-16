@@ -12,6 +12,8 @@ module.exports = (() => {
       id: course._id,
       name: course.name,
       studentsCount: course.students.length,
+      hasPlanningPrompt: course.hasPlanningPrompt,
+      planningPrompt: course.planningPrompt,
       instructors
     };
   }
