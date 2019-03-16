@@ -110,7 +110,7 @@ module.exports = (() => {
         const { name, value } = option;
         const result = new Date(date.getTime());
         if (name === 'hourAdvance') {
-          result.setHour(result.getHours() - value);
+          result.setHours(result.getHours() - value);
         }
         if (name === 'dayAdvance') {
           result.setDate(result.getDate() - value);
