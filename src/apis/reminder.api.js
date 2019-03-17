@@ -4,7 +4,7 @@ module.exports = (() => {
   const { UserModelEnum } = require('../models');
   const { AuthService } = require('../services');
   const { userAuthenticatorFactory } = AuthService;
-  const { RemindersPopulator } = require('../populators');
+  const { SubremindersPopulator } = require('../populators');
 
   const router = express.Router();
 
@@ -16,7 +16,9 @@ module.exports = (() => {
     ]),
     (req, res) => {
       ReminderService.getUpcomingReminders(req.currentUser)
-        .then(reminders => res.send(RemindersPopulator.populate(reminders)))
+        .then(subreminders =>
+          res.send(SubremindersPopulator.populate(subreminders))
+        )
         .catch(err => {
           console.error(err);
           res.status(500).send({ error: err.message });

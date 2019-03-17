@@ -8,6 +8,7 @@ module.exports = (() => {
       id: subreminder._id,
       name: subreminder.name,
       dateTime: subreminder.dateTime,
+      course: subreminder.course,
       parentReminder: subreminder.parentReminder,
       type: 'reminder',
       for: forObj

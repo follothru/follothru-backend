@@ -74,7 +74,8 @@ module.exports = (() => {
             date =>
               new SubreminderModel({
                 name,
-                dateTime: date
+                dateTime: date,
+                course
               })
           );
           subreminders.forEach(subreminder => subreminder.save());
@@ -289,12 +290,12 @@ module.exports = (() => {
     });
   }
 
-  function findReminderForCourses(courses) {
+  function findSubReminderForCourses(courses) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(courses, 'courses');
         const courseIds = courses.map(course => course._id);
-        getReminders({ course: { $in: courseIds } })
+        getSubReminders({ course: { $in: courseIds } }, 10)
           .then(resolve)
           .catch(reject);
       } catch (err) {
@@ -309,7 +310,7 @@ module.exports = (() => {
       try {
         ValidationUtils.notNullOrEmpty(user, 'user');
         CourseService.findAllCoursesForUser(user)
-          .then(findReminderForCourses)
+          .then(findSubReminderForCourses)
           .then(resolve)
           .catch(reject);
       } catch (err) {
@@ -352,13 +353,22 @@ module.exports = (() => {
       .populate('course');
   }
 
+  function getSubReminders(conditions, limit) {
+    if (limit) {
+      return SubreminderModel.find(conditions)
+        .populate('course')
+        .sort({ dateTime: 1 })
+        .limit(limit);
+    }
+    return SubreminderModel.find(conditions).sort({ date: -1 });
+  }
+
   return {
     findAll,
     deleteReminderById,
     deleteRemindersByCourseId,
     getRemindersByCourseId,
     createReminders,
-    getUpcomingReminders,
-    findReminderForCourses
+    getUpcomingReminders
   };
 })();

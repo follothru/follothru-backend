@@ -4,6 +4,7 @@ module.exports = (() => {
   const Subreminder = mongoose.Schema({
     name: String,
     dateTime: Date,
+    course: { type: mongoose.Types.ObjectId, ref: 'CourseModel' },
     email: { type: mongoose.Types.ObjectId, ref: 'EmailModel' }
   });
 
