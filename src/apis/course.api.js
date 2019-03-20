@@ -142,7 +142,7 @@ module.exports = (() => {
       const subreminderId = req.params.subreminderId;
       const { email } = req.body;
       CourseService.addEmailForSubreminder(subreminderId, email)
-        .then(result =>
+        .then(() =>
           res.send({
             message: 'success'
           })
@@ -164,7 +164,7 @@ module.exports = (() => {
       const subreminderId = req.params.subreminderId;
       const { components } = req.body;
       CourseService.addComponentsToEmail(subreminderId, components)
-        .then(result =>
+        .then(() =>
           res.send({
             message: 'success'
           })
