@@ -115,6 +115,24 @@ module.exports = (() => {
     }
   );
 
+  router.get(
+    '/:courseId/reminder/:reminderId',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {}
+  );
+
+  router.post(
+    '/:courseId/reminder/:reminderId/email',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {}
+  );
+
   router.post(
     '/:courseId/reminder',
     userAuthenticatorFactory([
@@ -177,23 +195,7 @@ module.exports = (() => {
         hasPlanningPrompt,
         planningPrompt
       )
-        .then(result => {
-          const id = result._id;
-          res.send({
-            id,
-            name,
-            description,
-            endDate,
-            instructors: instructors.map(instructor => {
-              return {
-                id: instructor._id,
-                firstname: instructor.firstname,
-                lastname: instructor.lastname,
-                email: instructor.email
-              };
-            })
-          });
-        })
+        .then(result => res.send(CoursePopulator.populate(result)))
         .catch(err => {
           console.error(err);
           res.status(500).send({
