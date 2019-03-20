@@ -7,8 +7,28 @@ module.exports = (() => {
     return EmailModel.find().populate('components');
   }
 
-  function addEmail(reqBody) {
-    let { components } = reqBody;
+  function addComponentsToEmail(emailId, components) {
+    emailId = mongoose.Types.ObjectId(emailId);
+    components = components.map(component =>
+      EmailComponentService.addComponent(component)
+    );
+    return Promise.all(components)
+      .then(results => {
+        return results.map(res => res._id);
+      })
+      .then(componentIds => {
+        return EmailModel.updateOne(
+          { _id: emailId },
+          { $push: { components: { $each: componentIds } } }
+        );
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  function addEmail(req) {
+    let { components } = req;
     const _id = mongoose.Types.ObjectId();
     let newEmail = new EmailModel({
       _id
@@ -27,5 +47,5 @@ module.exports = (() => {
       })
       .catch();
   }
-  return { addEmail, getAllEmail };
+  return { addEmail, getAllEmail, addComponentsToEmail };
 })();

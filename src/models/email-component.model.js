@@ -13,9 +13,5 @@ module.exports = (() => {
     content: String
   });
 
-  // EmailComponentSchema.virtual('EmailComponentEnum').get(
-  //   () => EmailComponentEnum
-  // );
-
   return mongoose.model('EmailComponentModel', EmailComponentSchema);
 })();
