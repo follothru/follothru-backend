@@ -44,8 +44,7 @@ module.exports = (() => {
         const { _id } = result;
         return SubreminderModel.updateOne(
           { _id: mongoose.Types.ObjectId(subreminderId) },
-          { $set: { email: _id } },
-          { upsert: true }
+          { $set: { email: _id } }
         );
       })
       .then(result => {
