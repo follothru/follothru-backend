@@ -8,23 +8,28 @@ module.exports = (() => {
   }
 
   function addComponentsToEmail(emailId, components) {
-    emailId = mongoose.Types.ObjectId(emailId);
-    components = components.map(component =>
-      EmailComponentService.addComponent(component)
-    );
-    return Promise.all(components)
-      .then(results => {
-        return results.map(res => res._id);
-      })
-      .then(componentIds => {
-        return EmailModel.updateOne(
-          { _id: emailId },
-          { $push: { components: { $each: componentIds } } }
-        );
-      })
-      .catch(err => {
-        console.error(err);
-      });
+    return new Promise((resolve, reject) => {
+      emailId = mongoose.Types.ObjectId(emailId);
+      components = components.map(component =>
+        EmailComponentService.addComponent(component)
+      );
+
+      Promise.all(components)
+        .then(results => {
+          return results.map(res => res._id);
+        })
+        .then(componentIds => {
+          return EmailModel.updateOne(
+            { _id: emailId },
+            { $push: { components: { $each: componentIds } } }
+          );
+        })
+        .then(resolve)
+        .catch(err => {
+          reject(err);
+          console.error(err);
+        });
+    });
   }
 
   function addEmail(req) {

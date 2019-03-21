@@ -3,12 +3,13 @@ module.exports = (() => {
   const router = express.Router();
   const { CourseService, AuthService } = require('../services');
   const { UserModelEnum } = require('../models');
-  const { RemindersPopulator } = require('../populators');
   const { userAuthenticatorFactory } = AuthService;
   const {
     CoursePopulator,
     CoursesPopulator,
-    StudentsPopulator
+    StudentsPopulator,
+    RemindersPopulator,
+    SubreminderPopulator
   } = require('../populators');
 
   router.get(
@@ -115,22 +116,6 @@ module.exports = (() => {
     }
   );
 
-  router.get(
-    '/:courseId/reminder/:reminderId/subreminder/:subreminderId',
-    userAuthenticatorFactory([
-      UserModelEnum.UserGroup.INSTRUCTOR,
-      UserModelEnum.UserGroup.ADMIN
-    ]),
-    (req, res) => {
-      const subreminderId = req.params.subreminderId;
-      CourseService.getSubreminderById(subreminderId)
-        .then(result => res.send(result))
-        .catch(err => {
-          res.status(500).send({ error: err.message });
-        });
-    }
-  );
-
   // post a email for subreminder in reminder
   router.post(
     '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email',
@@ -148,29 +133,29 @@ module.exports = (() => {
           })
         )
         .catch(err => {
-          res.send({ error: err.message }).status(500);
+          res.status(500).send({ error: err.message });
         });
     }
   );
 
   // add a component to email
   router.post(
-    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/emailComponent',
+    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email/:emailId/components',
     userAuthenticatorFactory([
       UserModelEnum.UserGroup.INSTRUCTOR,
       UserModelEnum.UserGroup.ADMIN
     ]),
     (req, res) => {
-      const subreminderId = req.params.subreminderId;
+      const emailId = req.params.emailId;
       const { components } = req.body;
-      CourseService.addComponentsToEmail(subreminderId, components)
+      CourseService.addComponentsToEmail(emailId, components)
         .then(() =>
           res.send({
             message: 'success'
           })
         )
         .catch(err => {
-          res.send({ error: err.message }).status(500);
+          res.status(500).send({ error: err.message });
         });
     }
   );

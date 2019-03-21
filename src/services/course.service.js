@@ -6,6 +6,7 @@ module.exports = (() => {
   const SubreminderService = require('./subreminder.service.js');
   const StudentService = require('./student.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
+  const EmailService = require('./email.service.js');
 
   function findAllCourses() {
     return CourseModel.find().populate('instructors');
@@ -169,8 +170,8 @@ module.exports = (() => {
     return SubreminderService.addEmail(subreminderId, email);
   }
 
-  function addComponentsToEmail(subreminderId, components) {
-    return SubreminderService.addComponentsToEmail(subreminderId, components);
+  function addComponentsToEmail(emailId, components) {
+    return EmailService.addComponentsToEmail(emailId, components);
   }
 
   return {
