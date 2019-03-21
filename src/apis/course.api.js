@@ -8,8 +8,7 @@ module.exports = (() => {
     CoursePopulator,
     CoursesPopulator,
     StudentsPopulator,
-    RemindersPopulator,
-    SubreminderPopulator
+    RemindersPopulator
   } = require('../populators');
 
   router.get(
