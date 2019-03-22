@@ -91,7 +91,6 @@ module.exports = (() => {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(courseId, 'courseId');
-        ReminderService.deleteRemindersByCourseId(courseId);
         CourseModel.deleteOne({ _id: new mongoose.Types.ObjectId(courseId) })
           .then(result => {
             if (result.n <= 0) {
