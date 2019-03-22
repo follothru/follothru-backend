@@ -3,8 +3,10 @@ module.exports = (() => {
   const CourseModel = require('../models/course.model.js');
   const UserService = require('./user.service.js');
   const ReminderService = require('./reminder.service.js');
+  const SubreminderService = require('./subreminder.service.js');
   const StudentService = require('./student.service.js');
   const ValidationUtils = require('../utils/validation.util.js');
+  const EmailService = require('./email.service.js');
 
   function findAllCourses() {
     return CourseModel.find().populate('instructors');
@@ -160,6 +162,18 @@ module.exports = (() => {
     });
   }
 
+  function getSubreminderById(id) {
+    return SubreminderService.getSubreminderById(id);
+  }
+
+  function addEmailForSubreminder(subreminderId, email) {
+    return SubreminderService.addEmail(subreminderId, email);
+  }
+
+  function addComponentsToEmail(emailId, components) {
+    return EmailService.addComponentsToEmail(emailId, components);
+  }
+
   return {
     findAllCourses,
     findAllCoursesForUser,
@@ -170,6 +184,9 @@ module.exports = (() => {
     createReminders,
     getRemindersByCourseId,
     studentEnroll,
-    getStudentsEnrolled
+    getStudentsEnrolled,
+    getSubreminderById,
+    addEmailForSubreminder,
+    addComponentsToEmail
   };
 })();

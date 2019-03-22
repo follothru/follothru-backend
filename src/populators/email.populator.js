@@ -3,9 +3,11 @@ module.exports = (() => {
   function populate(email) {
     const { _id } = email;
     let { components } = email;
-    components = components.map(component =>
-      EmailComponentPopulator.populate(component)
-    );
+    if (email.components) {
+      components = components.map(component =>
+        EmailComponentPopulator.populate(component)
+      );
+    }
     return {
       id: _id,
       components

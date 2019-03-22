@@ -3,12 +3,12 @@ module.exports = (() => {
   const router = express.Router();
   const { CourseService, AuthService } = require('../services');
   const { UserModelEnum } = require('../models');
-  const { RemindersPopulator } = require('../populators');
   const { userAuthenticatorFactory } = AuthService;
   const {
     CoursePopulator,
     CoursesPopulator,
-    StudentsPopulator
+    StudentsPopulator,
+    RemindersPopulator
   } = require('../populators');
 
   router.get(
@@ -115,6 +115,52 @@ module.exports = (() => {
     }
   );
 
+  // post a email for subreminder in reminder
+  router.post(
+    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {
+      const subreminderId = req.params.subreminderId;
+      const { email } = req.body;
+      CourseService.addEmailForSubreminder(subreminderId, email)
+        .then(() =>
+          res.send({
+            message: 'success'
+          })
+        )
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({ error: err.message });
+        });
+    }
+  );
+
+  // add a component to email
+  router.post(
+    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email/:emailId/components',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {
+      const emailId = req.params.emailId;
+      const { components } = req.body;
+      CourseService.addComponentsToEmail(emailId, components)
+        .then(() =>
+          res.send({
+            message: 'success'
+          })
+        )
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({ error: err.message });
+        });
+    }
+  );
+
   router.post(
     '/:courseId/reminder',
     userAuthenticatorFactory([
@@ -177,23 +223,7 @@ module.exports = (() => {
         hasPlanningPrompt,
         planningPrompt
       )
-        .then(result => {
-          const id = result._id;
-          res.send({
-            id,
-            name,
-            description,
-            endDate,
-            instructors: instructors.map(instructor => {
-              return {
-                id: instructor._id,
-                firstname: instructor.firstname,
-                lastname: instructor.lastname,
-                email: instructor.email
-              };
-            })
-          });
-        })
+        .then(result => res.send(CoursePopulator.populate(result)))
         .catch(err => {
           console.error(err);
           res.status(500).send({

@@ -8,6 +8,7 @@ const ActivityService = require('./activity.service.js');
 const AuthService = require('./auth.service.js');
 const EmailService = require('./email.service.js');
 const EmailComponentService = require('./email-component.service.js');
+const SubreminderService = require('./subreminder.service.js');
 
 module.exports = {
   ReminderService,
@@ -19,5 +20,6 @@ module.exports = {
   ActivityService,
   AuthService,
   EmailService,
-  EmailComponentService
+  EmailComponentService,
+  SubreminderService
 };

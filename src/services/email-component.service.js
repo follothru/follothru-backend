@@ -12,6 +12,11 @@ module.exports = (() => {
     return emailComponent.save();
   }
 
-  function removeComponent() {}
+  function removeComponent(componentId) {
+    return EmailComponentModel.remove({
+      _id: mongoose.Types.ObjectId(componentId)
+    });
+  }
+
   return { addComponent, removeComponent };
 })();

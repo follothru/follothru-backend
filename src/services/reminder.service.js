@@ -369,6 +369,8 @@ module.exports = (() => {
     deleteRemindersByCourseId,
     getRemindersByCourseId,
     createReminders,
-    getUpcomingReminders
+    getUpcomingReminders,
+    getReminders,
+    getSubReminders
   };
 })();
