@@ -65,6 +65,16 @@ module.exports = (() => {
     });
   }
 
+  function findUserById(id) {
+    return new Promise((resolve, reject) => {
+      UserModel.find({ _id: mongoose.Types.ObjectId(id) })
+        .then(user => {
+          resolve(user);
+        })
+        .catch(err => reject(err));
+    });
+  }
+
   function validateUser(username, password) {
     return new Promise((resolve, reject) => {
       try {
@@ -95,6 +105,54 @@ module.exports = (() => {
       : false;
   }
 
+  function deleteUser(id) {
+    return UserModel.deleteOne({ _id: mongoose.Types.ObjectId(id) });
+  }
+
+  function assignAdmin(id) {
+    return new Promise((resolve, reject) => {
+      findUserById(id)
+        .then(result => {
+          let message = '';
+          const userGroups = result.groups;
+          // if user is not an admin yet
+          if (
+            !userGroups.some(group => group === UserModelEnum.UserGroup.ADMIN)
+          ) {
+            UserModel.updateOne(
+              { _id: mongoose.Types.ObjectId(id) },
+              { $push: { groups: UserModelEnum.UserGroup.ADMIN } }
+            )
+              .then(() => {
+                message = 'successfully assigned user to admin';
+                resolve({ message });
+              })
+              .catch(reject);
+          } else {
+            message = 'user is already an admin';
+            resolve({ message });
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  function removeAdmin(id) {
+    return new Promise((resolve, reject) => {
+      UserModel.update(
+        {
+          _id: mongoose.Types.ObjectId(id)
+        },
+        { $pull: { groups: UserModelEnum.UserGroup.ADMIN } },
+        {
+          multi: true
+        }
+      )
+        .then(resolve)
+        .catch(err => reject(err));
+    });
+  }
+
   return {
     findAllUsers,
     createUser,
@@ -102,6 +160,9 @@ module.exports = (() => {
     validateUser,
     Errors,
     isSuperAdmin,
-    isAdmin
+    isAdmin,
+    deleteUser,
+    assignAdmin,
+    removeAdmin
   };
 })();

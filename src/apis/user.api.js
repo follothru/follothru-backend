@@ -1,7 +1,9 @@
 module.exports = (() => {
   const express = require('express');
   const router = express.Router();
-  const { UserService } = require('../services');
+  const { UserService, AuthService } = require('../services');
+  const { UserModelEnum } = require('../models');
+  const { userAuthenticatorFactory } = AuthService;
 
   router.get('/', (req, res) => {
     const { ids } = req.body;
@@ -41,6 +43,57 @@ module.exports = (() => {
         res.status(status).send({ status, message });
       });
   });
+
+  router.put(
+    '/:userId/assignAdmin',
+    userAuthenticatorFactory([UserModelEnum.UserGroup.SUPER_ADMIN]),
+    (req, res) => {
+      const userId = req.params.userId;
+      UserService.assignAdmin(userId)
+        .then(message => {
+          res.send(message);
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    }
+  );
+
+  router.put(
+    '/:userId/removeAdmin',
+    userAuthenticatorFactory([UserModelEnum.UserGroup.SUPER_ADMIN]),
+    (req, res) => {
+      const userId = req.params.userId;
+      UserService.removeAdmin(userId)
+        .then(() => {
+          const message = 'successfully removed admin privilege from user';
+          res.send({ message });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    }
+  );
+
+  router.delete(
+    '/:userId',
+    userAuthenticatorFactory([UserModelEnum.UserGroup.SUPER_ADMIN]),
+    (req, res) => {
+      const userId = req.params.userId;
+      UserService.deleteUser(userId)
+        .then(() => {
+          const message = 'successfully deleted';
+          res.send({ message });
+        })
+        .catch(err => {
+          console.error(err);
+          const error = 'failed to delete user';
+          res.status(500).send({ error });
+        });
+    }
+  );
 
   return router;
 })();
