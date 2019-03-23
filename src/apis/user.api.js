@@ -55,7 +55,8 @@ module.exports = (() => {
         })
         .catch(err => {
           console.error(err);
-          res.status(500).send(err);
+          const error = 'failed to assign admin';
+          res.status(500).send({ error });
         });
     }
   );
@@ -72,7 +73,8 @@ module.exports = (() => {
         })
         .catch(err => {
           console.error(err);
-          res.status(500).send(err);
+          const error = 'failed to remove admin privilege from user';
+          res.status(500).send({ error });
         });
     }
   );
