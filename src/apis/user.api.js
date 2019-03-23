@@ -51,7 +51,7 @@ module.exports = (() => {
       const userId = req.params.userId;
       UserService.assignAdmin(userId)
         .then(message => {
-          res.send(message);
+          res.send({ message });
         })
         .catch(err => {
           console.error(err);

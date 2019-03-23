@@ -125,12 +125,12 @@ module.exports = (() => {
             )
               .then(() => {
                 message = 'successfully assigned user to admin';
-                resolve({ message });
+                resolve(message);
               })
               .catch(reject);
           } else {
             message = 'user is already an admin';
-            resolve({ message });
+            resolve(message);
           }
         })
         .catch(reject);
