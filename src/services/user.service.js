@@ -67,7 +67,7 @@ module.exports = (() => {
 
   function findUserById(id) {
     return new Promise((resolve, reject) => {
-      UserModel.find({ _id: mongoose.Types.ObjectId(id) })
+      UserModel.findOne({ _id: mongoose.Types.ObjectId(id) })
         .then(user => {
           resolve(user);
         })
