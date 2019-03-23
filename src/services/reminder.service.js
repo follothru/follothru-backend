@@ -85,12 +85,8 @@ module.exports = (() => {
         });
 
         Promise.all(promises)
-          .then(() => {
-            return reminder.save();
-          })
-          .then(reminders => {
-            resolve(reminders);
-          })
+          .then(() => reminder.save())
+          .then(resolve)
           .catch(reject);
       } catch (err) {
         reject(err);
@@ -199,19 +195,6 @@ module.exports = (() => {
     return results;
   }
 
-  function getRemindersById(id) {
-    return new Promise((resolve, reject) => {
-      try {
-        ValidationUtils.notNullOrEmpty(id, 'id');
-        getReminder({ _id: new mongoose.Types.ObjectId(id) })
-          .then(resolve)
-          .catch(reject);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
   function getRemindersByCourseId(courseId) {
     return new Promise((resolve, reject) => {
       try {
@@ -225,46 +208,15 @@ module.exports = (() => {
     });
   }
 
-  function deleteRemindersByCourseId(courseId) {
-    const promise = getRemindersByCourseId(courseId).then(reminders => {
-      const events = reminders.reduce(
-        (prev, curr) => [...prev, ...curr.events],
-        []
-      );
-      const activities = reminders.reduce(
-        (prev, curr) => [...prev, ...curr.activities],
-        []
-      );
-      return Promise.all([
-        EventService.deleteEvents(events),
-        ActivityService.deleteActivities(activities)
-      ]);
-    });
-
-    return Promise.all([
-      promise,
-      ReminderModel.deleteMany({
-        course: new mongoose.Types.ObjectId(courseId)
-      })
-    ]);
-  }
-
   function deleteReminderById(reminderId) {
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(reminderId, 'reminderId');
-
-        getRemindersById(reminderId).then(reminder =>
-          Promise.all([
-            EventService.deleteEvents(reminder.events),
-            ActivityService.deleteActivities(reminder.activities),
-            ReminderModel.deleteOne({
-              _id: new mongoose.Types.ObjectId(reminderId)
-            })
-          ])
-            .then(resolve)
-            .catch(reject)
-        );
+        ReminderModel.deleteOne({
+          _id: new mongoose.Types.ObjectId(reminderId)
+        })
+          .then(resolve)
+          .catch(reject);
       } catch (err) {
         reject(err);
       }
@@ -290,50 +242,26 @@ module.exports = (() => {
     });
   }
 
-  function findSubReminderForCourses(courses) {
-    return new Promise((resolve, reject) => {
-      try {
-        ValidationUtils.notNullOrEmpty(courses, 'courses');
-        const courseIds = courses.map(course => course._id);
-        getSubReminders({ course: { $in: courseIds } }, 10)
-          .then(resolve)
-          .catch(reject);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
   function getUpcomingReminders(user) {
     const CourseService = require('./course.service.js');
     return new Promise((resolve, reject) => {
       try {
         ValidationUtils.notNullOrEmpty(user, 'user');
         CourseService.findAllCoursesForUser(user)
-          .then(findSubReminderForCourses)
+          .then(courses => {
+            const courseIds = courses.map(c => c._id);
+            const now = new Date();
+            return getSubReminders(
+              { course: { $in: courseIds }, dateTime: { $gte: now } },
+              10
+            );
+          })
           .then(resolve)
           .catch(reject);
       } catch (err) {
         reject(err);
       }
     });
-  }
-
-  function getReminder(conditions) {
-    return ReminderModel.findOne(conditions)
-      .populate({
-        path: 'events',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate({
-        path: 'activities',
-        populate: {
-          path: 'subreminders'
-        }
-      })
-      .populate('course');
   }
 
   function getReminders(conditions) {
@@ -366,7 +294,6 @@ module.exports = (() => {
   return {
     findAll,
     deleteReminderById,
-    deleteRemindersByCourseId,
     getRemindersByCourseId,
     createReminders,
     getUpcomingReminders,
