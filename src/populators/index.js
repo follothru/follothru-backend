@@ -14,6 +14,10 @@ const EmailPopulator = require('./email.populator.js');
 const EmailComponentPopulator = require('./email-component.populator.js');
 const StudentPopulator = require('./student.populator.js');
 const StudentsPopulator = require('./students.populator.js');
+const UserPopulator = require('./user.populator.js');
+const SessionPopulator = require('./session.populator.js');
+const UserGroupsPopulator = require('./user-groups.populator.js');
+const UserGroupPopulator = require('./user-group.populator.js');
 
 module.exports = {
   EventPopulator,
@@ -31,5 +35,9 @@ module.exports = {
   EmailPopulator,
   EmailComponentPopulator,
   StudentPopulator,
-  StudentsPopulator
+  StudentsPopulator,
+  UserPopulator,
+  SessionPopulator,
+  UserGroupsPopulator,
+  UserGroupPopulator
 };

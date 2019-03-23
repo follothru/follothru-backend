@@ -2,6 +2,7 @@ module.exports = (() => {
   const express = require('express');
   const router = express.Router();
   const { SessionService } = require('../services');
+  const { SessionPopulator } = require('../populators');
 
   /**
    * Validate session
@@ -9,23 +10,7 @@ module.exports = (() => {
   router.get('/:sessionId', (req, res) => {
     const { sessionId } = req.params;
     SessionService.validateUserSession(sessionId)
-      .then(result => {
-        const id = result._id;
-        const { user, creationTime } = result;
-
-        const userId = user._id;
-        const { firstname, lastname, email } = user;
-        res.send({
-          id,
-          creationTime,
-          user: {
-            userId,
-            firstname,
-            lastname,
-            email
-          }
-        });
-      })
+      .then(session => res.send(SessionPopulator.populate(session)))
       .catch(err => {
         console.error(err);
         res.status(500).send({
