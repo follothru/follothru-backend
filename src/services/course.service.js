@@ -13,7 +13,7 @@ module.exports = (() => {
   }
 
   function findAllCoursesForUser(user) {
-    if (UserService.isSuperAdmin(user)) {
+    if (UserService.isSuperAdmin(user) || UserService.isAdmin(user)) {
       return findAllCourses();
     }
     return CourseModel.find({ instructors: user }).populate('instructors');

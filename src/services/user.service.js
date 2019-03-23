@@ -89,12 +89,19 @@ module.exports = (() => {
       : false;
   }
 
+  function isAdmin(user) {
+    return user
+      ? user.groups.some(group => group === UserModelEnum.UserGroup.ADMIN)
+      : false;
+  }
+
   return {
     findAllUsers,
     createUser,
     findUsersByIds,
     validateUser,
     Errors,
-    isSuperAdmin
+    isSuperAdmin,
+    isAdmin
   };
 })();
