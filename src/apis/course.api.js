@@ -56,10 +56,7 @@ module.exports = (() => {
 
   router.put(
     '/:id',
-    userAuthenticatorFactory([
-      UserModelEnum.UserGroup.ADMIN,
-      UserModelEnum.UserGroup.INSTRUCTOR
-    ]),
+    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
     (req, res) => {
       const id = req.params.id;
       const {
@@ -235,16 +232,34 @@ module.exports = (() => {
 
   router.delete(
     '/:courseId',
-    userAuthenticatorFactory([
-      UserModelEnum.UserGroup.INSTRUCTOR,
-      UserModelEnum.UserGroup.ADMIN
-    ]),
+    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
     (req, res) => {
       const { courseId } = req.params;
       CourseService.deleteCourse(courseId)
         .then(result => {
           res.send({
             n: result.n
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({
+            error: err.message
+          });
+        });
+    }
+  );
+
+  router.put(
+    '/:courseId/approve',
+    userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
+    (req, res) => {
+      const { courseId } = req.params;
+      CourseService.approveCourse(courseId)
+        .then(() => {
+          res.send({
+            id: courseId,
+            message: 'Success'
           });
         })
         .catch(err => {
