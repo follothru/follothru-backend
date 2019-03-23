@@ -132,6 +132,22 @@ module.exports = (() => {
     return ReminderService.getRemindersByCourseId(courseId);
   }
 
+  function approveCourse(courseId) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        CourseModel.updateOne(
+          { _id: new mongoose.Types.ObjectId(courseId) },
+          { $set: { approved: true } }
+        )
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   function getStudentsEnrolled(courseId) {
     return new Promise((resolve, reject) => {
       const id = new mongoose.Types.ObjectId(courseId);
@@ -182,6 +198,7 @@ module.exports = (() => {
     deleteCourse,
     createReminders,
     getRemindersByCourseId,
+    approveCourse,
     studentEnroll,
     getStudentsEnrolled,
     getSubreminderById,
