@@ -4,23 +4,16 @@ module.exports = (() => {
   const { UserService, AuthService } = require('../services');
   const { UserModelEnum } = require('../models');
   const { userAuthenticatorFactory } = AuthService;
+  const { UsersPopulator } = require('../populators');
 
   router.get('/', (req, res) => {
     const { ids } = req.body;
-    let promise;
-    if (ids && ids.length > 0) {
-      promise = UserService.findUsersByIds(ids);
-    } else {
-      promise = UserService.findAllUsers().then(userModels =>
-        userModels.map(userModel => {
-          const id = userModel._id;
-          const { firstname, lastname, email, groups } = userModel;
-          return { id, firstname, lastname, email, groups };
-        })
-      );
-    }
+    const promise =
+      ids && ids.length > 0
+        ? UserService.findUsersByIds(ids)
+        : UserService.findAllUsers();
     promise
-      .then(result => res.send(result))
+      .then(users => res.send(UsersPopulator.populate(users)))
       .catch(err => {
         console.error(err);
         res.status(500).send(err);
