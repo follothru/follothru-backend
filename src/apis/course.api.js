@@ -303,17 +303,24 @@ module.exports = (() => {
       });
   });
 
-  router.delete('/:courseId/student/:studentId', (req, res) => {
-    const { courseId, studentId } = req.params;
-    CourseService.removeStudent(courseId, studentId)
-      .then(() => {
-        res.send({ message: 'Success' });
-      })
-      .catch(err => {
-        console.error(err);
-        res.status(500).send({ error: err.message });
-      });
-  });
+  router.delete(
+    '/:courseId/student/:studentId',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.SUPER_ADMIN,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {
+      const { courseId, studentId } = req.params;
+      CourseService.removeStudent(courseId, studentId)
+        .then(() => {
+          res.send({ message: 'Success' });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({ error: err.message });
+        });
+    }
+  );
 
   return router;
 })();
