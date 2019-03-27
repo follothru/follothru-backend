@@ -160,10 +160,25 @@ module.exports = (() => {
   }
 
   function addNewStudent(courseId, newStudent) {
-    return CourseModel.updateOne(
-      { _id: courseId },
-      { $push: { students: newStudent } }
-    );
+    return new Promise((resolve, reject) => {
+      CourseModel.findOne({ _id: courseId, students: { $in: newStudent._id } })
+        .then(result => {
+          if (result) {
+            reject({ message: 'user has already been registered in course' });
+          } else {
+            CourseModel.updateOne(
+              { _id: courseId },
+              { $push: { students: newStudent } }
+            )
+              .then(resolve)
+              .catch(reject);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          reject(err);
+        });
+    });
   }
 
   function studentEnroll(courseId, prefName, email) {
@@ -189,6 +204,13 @@ module.exports = (() => {
     return EmailService.addComponentsToEmail(emailId, components);
   }
 
+  function removeStudent(courseId, studentId) {
+    return CourseModel.updateOne(
+      { _id: courseId },
+      { $pull: { students: studentId } }
+    );
+  }
+
   return {
     findAllCourses,
     findAllCoursesForUser,
@@ -203,6 +225,7 @@ module.exports = (() => {
     getStudentsEnrolled,
     getSubreminderById,
     addEmailForSubreminder,
-    addComponentsToEmail
+    addComponentsToEmail,
+    removeStudent
   };
 })();

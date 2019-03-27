@@ -12,10 +12,33 @@ module.exports = (() => {
       try {
         ValidationUtils.notNullOrEmpty(prefName, 'prefer name');
         ValidationUtils.notNullOrEmpty(email, 'email');
-        const _id = new mongoose.Types.ObjectId();
-        const newStudent = new StudentModel({ _id, prefName, email });
-        newStudent
-          .save()
+        findStudentByEmail(email)
+          .then(result => {
+            // return existing student if email is found
+            if (result) {
+              resolve(result);
+            } else {
+              // create a new student if student doesn't exist
+              const _id = new mongoose.Types.ObjectId();
+              const newStudent = new StudentModel({ _id, prefName, email });
+              newStudent
+                .save()
+                .then(resolve)
+                .catch(reject);
+            }
+          })
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function findStudentByEmail(email) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(email, 'email');
+        StudentModel.findOne({ email })
           .then(resolve)
           .catch(reject);
       } catch (err) {
