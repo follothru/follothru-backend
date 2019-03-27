@@ -4,6 +4,12 @@ module.exports = (() => {
 
   function checkUserPrivilege(req, res, next, requiredPrivileges) {
     SessionService.authenticateSession(req, res).then(currentUser => {
+      // error checking
+      if (!currentUser) {
+        const error = 'You are not permitted to perform operation';
+        res.status(403).send({ error });
+        return;
+      }
       req.currentUser = currentUser;
       const currentUserGroups = currentUser.groups;
       // if current user is super admin, pass it
