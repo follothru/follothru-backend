@@ -23,5 +23,16 @@ module.exports = (() => {
       .catch();
   });
 
+  router.get('/sendEmail', (req, res) => {
+    EmailService.sendEmail()
+      .then(() => {
+        res.send({ message: 'all emails are sent successfully' });
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  });
+
   return router;
 })();
