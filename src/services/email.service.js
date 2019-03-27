@@ -1,6 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const { EmailModel } = require('../models');
+  const { Mailer } = require('../mailer');
   const EmailComponentService = require('./email-component.service.js');
 
   function getAllEmail() {
@@ -52,5 +53,27 @@ module.exports = (() => {
       })
       .catch();
   }
-  return { addEmail, getAllEmail, addComponentsToEmail };
+
+  function sendEmail() {
+    return new Promise((resolve, reject) => {
+      let obj = {
+        to: ['gzchrisxjh@gmail.com', 'f2280c@gmail.com'],
+        from: {
+          name: 'follothru',
+          address: 'psytestemail@gmail.com'
+        },
+        subject: 'testing',
+        html: '<strong>sent from mailer</strong>',
+        text: 'sent from mailer'
+      };
+      Mailer.sendEmail(obj, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+  return { addEmail, getAllEmail, addComponentsToEmail, sendEmail };
 })();

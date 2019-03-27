@@ -28,7 +28,8 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "mongoose": "^5.4.1"
+    "mongoose": "^5.4.1",
+    "nodemailer": "^6.0.0"
   },
   "devDependencies": {
     "eslint": "^5.15.3",
