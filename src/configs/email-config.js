@@ -1,4 +1,4 @@
 module.exports = {
-  username: 'psytestemail@gmail.com',
-  password: 'psy-soft-dev'
+  username: process.env.email_username,
+  password: process.env.email_password
 };
