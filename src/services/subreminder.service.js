@@ -3,8 +3,10 @@ module.exports = (() => {
   const { SubreminderModel } = require('../models');
   const EmailService = require('./email.service.js');
 
-  function getUpcomingSubreminders() {
-    return SubreminderModel.find({ dateTime: { $gte: new Date() } })
+  function getSubremindersToSend() {
+    return SubreminderModel.find({
+      dateTime: { $gte: new Date() }
+    })
       .populate('course')
       .populate({
         path: 'email',
@@ -44,9 +46,27 @@ module.exports = (() => {
   // should return all recipients
   function sendSubreminders() {
     return new Promise((resolve, reject) => {
-      getUpcomingSubreminders()
+      getSubremindersToSend()
         .then(subreminders => {
-          console.log(subreminders);
+          subreminders.map(subreminder => {
+            try {
+              const { isSent } = subreminder.email.isSent;
+              if (!isSent) {
+                const { students } = subreminder.course;
+                let emailComponents = subreminder.email.components;
+                // grab only the content part
+                emailComponents = emailComponents.map(
+                  emailComponent => emailComponent.content
+                );
+                const emailId = subreminder.email._id;
+                EmailService.sendEmail(emailId, students, emailComponents)
+                  .then(resolve)
+                  .catch(reject);
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          });
         })
         .catch();
     });
@@ -55,7 +75,7 @@ module.exports = (() => {
   return {
     getSubreminderById,
     addEmail,
-    getUpcomingSubreminders,
+    getSubremindersToSend,
     sendSubreminders
   };
 })();

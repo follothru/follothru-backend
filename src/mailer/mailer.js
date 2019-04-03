@@ -9,15 +9,13 @@ module.exports = (() => {
     }
   });
 
-  // first param of cb should return any error
-  function sendEmail(obj, cb) {
+  function sendEmail(obj) {
     const { to, from, subject, html } = obj;
     if (!to || !from || !subject || !html) {
       const message = 'fields are not satisfied';
-      cb({ message });
-      return;
+      throw new Error({ message });
     } else {
-      return transporter.sendMail(obj, cb);
+      return transporter.sendMail(obj);
     }
   }
   return { sendEmail };

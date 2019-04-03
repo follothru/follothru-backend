@@ -5,7 +5,7 @@ module.exports = (() => {
   const { SubremindersPopulator } = require('../populators');
 
   router.get('/upcoming', (req, res) => {
-    SubreminderService.getUpcomingSubreminders()
+    SubreminderService.getSubremindersToSend()
       .then(subreminders =>
         res.send(SubremindersPopulator.populate(subreminders))
       )
@@ -18,7 +18,9 @@ module.exports = (() => {
   router.post('/send', (req, res) => {
     SubreminderService.sendSubreminders()
       .then(recipients => {
-        const message = `email sent to ${recipients}`;
+        const message = `email sent to ${
+          recipients && recipients.length > 0 ? recipients : 'no one'
+        }`;
         res.send({ message });
       })
       .catch(err => {

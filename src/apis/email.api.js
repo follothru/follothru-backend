@@ -17,18 +17,6 @@ module.exports = (() => {
       .catch();
   });
 
-  router.get('/template', (req, res) => {
-    EmailService.getEmailTemplate()
-      .then(template => {
-        res.setHeader('content-type', 'text/html');
-        res.send(template);
-      })
-      .catch(err => {
-        console.error(err);
-        res.send({ error: err.message });
-      });
-  });
-
   router.post('/', (req, res) => {
     EmailService.addEmail(req.body)
       .then(result => res.send(result._id))
