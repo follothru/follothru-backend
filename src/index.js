@@ -7,7 +7,9 @@ const {
   UserApi,
   SessionApi,
   StudentApi,
-  EmailApi
+  EmailApi,
+  EmailComponentApi,
+  SubreminderApi
 } = require('./apis');
 const {
   port,
@@ -43,5 +45,7 @@ app.use('/user', UserApi);
 app.use('/session', SessionApi);
 app.use('/student', StudentApi);
 app.use('/email', EmailApi);
+app.use('/emailComponent', EmailComponentApi);
+app.use('/subreminder', SubreminderApi);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

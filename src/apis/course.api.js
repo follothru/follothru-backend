@@ -121,8 +121,8 @@ module.exports = (() => {
     ]),
     (req, res) => {
       const subreminderId = req.params.subreminderId;
-      const { email } = req.body;
-      CourseService.addEmailForSubreminder(subreminderId, email)
+      const { components } = req.body;
+      CourseService.addEmailForSubreminder(subreminderId, components)
         .then(() =>
           res.send({
             message: 'success'

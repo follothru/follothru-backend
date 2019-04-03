@@ -7,7 +7,7 @@ module.exports = (() => {
   const { EmailPopulator } = require('../populators');
 
   router.get('/', (req, res) => {
-    EmailService.getAllEmail()
+    EmailService.getAllEmails()
       .then(results => {
         return results.map(result => EmailPopulator.populate(result));
       })
@@ -15,6 +15,18 @@ module.exports = (() => {
         res.send(result);
       })
       .catch();
+  });
+
+  router.get('/template', (req, res) => {
+    EmailService.getEmailTemplate()
+      .then(template => {
+        res.setHeader('content-type', 'text/html');
+        res.send(template);
+      })
+      .catch(err => {
+        console.error(err);
+        res.send({ error: err.message });
+      });
   });
 
   router.post('/', (req, res) => {
