@@ -1,7 +1,7 @@
 module.exports = (() => {
   const EmailComponentPopulator = require('./email-component.populator.js');
   function populate(email) {
-    const { _id } = email;
+    const { _id, isSent } = email;
     let { components } = email;
     if (email.components) {
       components = components.map(component =>
@@ -10,7 +10,8 @@ module.exports = (() => {
     }
     return {
       id: _id,
-      components
+      components,
+      isSent
     };
   }
   return { populate };

@@ -195,8 +195,8 @@ module.exports = (() => {
     return SubreminderService.getSubreminderById(id);
   }
 
-  function addEmailForSubreminder(subreminderId, email) {
-    return SubreminderService.addEmail(subreminderId, email);
+  function addEmailForSubreminder(subreminderId, emailComponents) {
+    return SubreminderService.addEmail(subreminderId, emailComponents);
   }
 
   function addComponentsToEmail(emailId, components) {

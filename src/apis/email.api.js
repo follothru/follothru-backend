@@ -7,7 +7,7 @@ module.exports = (() => {
   const { EmailPopulator } = require('../populators');
 
   router.get('/', (req, res) => {
-    EmailService.getAllEmail()
+    EmailService.getAllEmails()
       .then(results => {
         return results.map(result => EmailPopulator.populate(result));
       })

@@ -8,7 +8,11 @@ module.exports = (() => {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'EmailComponentModel'
       }
-    ]
+    ],
+    isSent: {
+      type: Boolean,
+      default: false
+    }
   });
 
   return mongoose.model('EmailModel', EmailSchema);
