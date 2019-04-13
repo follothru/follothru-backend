@@ -1,6 +1,7 @@
 module.exports = (() => {
   const mongoose = require('mongoose');
   const { SubreminderModel } = require('../models');
+  const ValidationUtils = require('../utils/validation.util.js');
   const EmailService = require('./email.service.js');
 
   function getSubremindersToSend() {
@@ -23,6 +24,26 @@ module.exports = (() => {
       path: 'email',
       populate: {
         path: 'components'
+      }
+    });
+  }
+
+  function deleteSubremindersByIds(subreminderIds) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(subreminderIds, 'subreminderIds');
+        if (subreminderIds.length <= 0) {
+          resolve();
+          return;
+        }
+        subreminderIds = subreminderIds.map(
+          id => new mongoose.Types.ObjectId(id)
+        );
+        SubreminderModel.deleteMany({ _id: { $in: subreminderIds } })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
       }
     });
   }
@@ -76,6 +97,7 @@ module.exports = (() => {
     getSubreminderById,
     addEmail,
     getSubremindersToSend,
-    sendSubreminders
+    sendSubreminders,
+    deleteSubremindersByIds
   };
 })();

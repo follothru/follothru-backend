@@ -112,52 +112,6 @@ module.exports = (() => {
     }
   );
 
-  // post a email for subreminder in reminder
-  router.post(
-    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email',
-    userAuthenticatorFactory([
-      UserModelEnum.UserGroup.INSTRUCTOR,
-      UserModelEnum.UserGroup.ADMIN
-    ]),
-    (req, res) => {
-      const subreminderId = req.params.subreminderId;
-      const { components } = req.body;
-      CourseService.addEmailForSubreminder(subreminderId, components)
-        .then(() =>
-          res.send({
-            message: 'success'
-          })
-        )
-        .catch(err => {
-          console.error(err);
-          res.status(500).send({ error: err.message });
-        });
-    }
-  );
-
-  // add a component to email
-  router.post(
-    '/:courseId/reminder/:reminderId/subreminder/:subreminderId/email/:emailId/components',
-    userAuthenticatorFactory([
-      UserModelEnum.UserGroup.INSTRUCTOR,
-      UserModelEnum.UserGroup.ADMIN
-    ]),
-    (req, res) => {
-      const emailId = req.params.emailId;
-      const { components } = req.body;
-      CourseService.addComponentsToEmail(emailId, components)
-        .then(() =>
-          res.send({
-            message: 'success'
-          })
-        )
-        .catch(err => {
-          console.error(err);
-          res.status(500).send({ error: err.message });
-        });
-    }
-  );
-
   router.post(
     '/:courseId/reminder',
     userAuthenticatorFactory([

@@ -18,8 +18,8 @@ module.exports = (() => {
   });
 
   router.post('/', (req, res) => {
-    const { content } = req.body;
-    EmailComponentService.addComponent(content)
+    const { templateId, values } = req.body;
+    EmailComponentService.addComponent(templateId, values)
       .then(emailComponent => {
         res.send({ id: emailComponent._id });
       })
@@ -27,14 +27,6 @@ module.exports = (() => {
         console.error(err);
         res.send({ error: err.message });
       });
-  });
-
-  router.put('/:id', (req, res) => {
-    const id = req.params.id;
-  });
-
-  router.delete('/:id', (req, res) => {
-    const id = req.params.id;
   });
 
   return router;

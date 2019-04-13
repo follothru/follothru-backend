@@ -4,6 +4,7 @@ module.exports = (() => {
   const ReminderSchema = mongoose.Schema({
     name: { type: String },
     course: { type: mongoose.Schema.Types.ObjectId, ref: 'CourseModel' },
+    email: { type: mongoose.Schema.Types.ObjectId, ref: 'EmailModel' },
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,

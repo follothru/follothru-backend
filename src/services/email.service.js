@@ -44,12 +44,41 @@ module.exports = (() => {
     return newEmail.save();
   }
 
+  function getTemplates() {
+    const AVAILABLE_TEMPLATES = [
+      'header',
+      'main-body',
+      'do-it-now',
+      'already-finished',
+      'edit-reminders',
+      'do-not-remind-again'
+    ];
+    const templateDir = __dirname + `/../../resources/email/templates`;
+    const templates = AVAILABLE_TEMPLATES;
+    let index = -1;
+    return templates.map(templateId => {
+      const path = `${templateDir}/${templateId}.hbs`;
+      const content = openFile(path);
+      index++;
+      return {
+        templateId,
+        index,
+        content
+      };
+    });
+  }
+
   function getTemplate(config) {
     const inFile = __dirname + '/../mailer/template/template_1.hbs';
     const source = fs.readFileSync(inFile, 'utf8');
     const template = hbs.compile(source, { strict: true });
     const result = template(config);
     return result;
+  }
+
+  function openFile(path) {
+    const fs = require('fs');
+    return fs.readFileSync(path, 'utf8');
   }
 
   function sendEmail(emailId, recipients, emailComponents) {
@@ -80,6 +109,7 @@ module.exports = (() => {
     addEmail,
     getAllEmails,
     addComponentsToEmail,
-    sendEmail
+    sendEmail,
+    getTemplates
   };
 })();

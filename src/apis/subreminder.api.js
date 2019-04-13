@@ -2,7 +2,9 @@ module.exports = (() => {
   const express = require('express');
   const router = express.Router();
   const { SubreminderService } = require('../services');
-  const { SubremindersPopulator } = require('../populators');
+  const { UserModelEnum } = require('../models');
+  const { AuthService } = require('../services');
+  const { userAuthenticatorFactory } = AuthService;
 
   router.post('/send', (req, res) => {
     SubreminderService.sendSubreminders()
@@ -18,5 +20,21 @@ module.exports = (() => {
       });
   });
 
+  router.delete(
+    '/',
+    userAuthenticatorFactory([
+      UserModelEnum.UserGroup.INSTRUCTOR,
+      UserModelEnum.UserGroup.ADMIN
+    ]),
+    (req, res) => {
+      const { subreminderIds } = req.body;
+      SubreminderService.deleteSubremindersByIds(subreminderIds)
+        .then(() => res.send({ message: 'success' }))
+        .catch(err => {
+          console.error(err);
+          res.status(500).send({ error: err.message });
+        });
+    }
+  );
   return router;
 })();

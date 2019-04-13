@@ -3,6 +3,7 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
   const ActivityService = require('./activity.service.js');
   const EventService = require('./event.service.js');
+  const { EmailModel, EmailComponentModel } = require('../models');
 
   const {
     ReminderModel,
@@ -291,6 +292,140 @@ module.exports = (() => {
     return SubreminderModel.find(conditions).sort({ date: -1 });
   }
 
+  function deleteEmailsForReminder(reminderId) {
+    return new Promise((resolve, reject) => {
+      if (!reminderId) {
+        resolve();
+        return;
+      }
+      EmailModel.deleteMany({ reminder: reminderId })
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  function deleteEmailsForSubReminder(subreminderId) {
+    return new Promise((resolve, reject) => {
+      if (!subreminderId) {
+        resolve();
+        return;
+      }
+      EmailModel.deleteMany({ subreminder: subreminderId })
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  function setReminderEmail(reminderId, templateIds, values) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(templateIds, 'templateIds');
+
+        const emailComponents = templateIds.map(templateId => {
+          let emailComponent = new EmailComponentModel({
+            _id: new mongoose.Types.ObjectId(),
+            templateId
+          });
+
+          if (templateId === 'main-body') {
+            ValidationUtils.notNullOrEmpty(values, 'values');
+            ValidationUtils.notNullOrEmpty(values.mainMessage, 'mainMessage');
+
+            emailComponent.values = { message: values.mainMessage };
+          } else if (templateId === 'do-it-now') {
+            ValidationUtils.notNullOrEmpty(values, 'values');
+            ValidationUtils.notNullOrEmpty(values.actionUrl, 'actionUrl');
+
+            emailComponent.values = { url: values.actionUrl };
+          }
+          return emailComponent;
+        });
+
+        const reminderIdObj = new mongoose.Types.ObjectId(reminderId);
+        deleteEmailsForReminder(reminderId);
+
+        Promise.all(emailComponents.map(comp => comp.save()))
+          .then(() => {
+            const emailId = new mongoose.Types.ObjectId();
+            const newEmail = new EmailModel({
+              _id: emailId,
+              reminder: reminderIdObj,
+              components: emailComponents
+            });
+            return newEmail
+              .save()
+              .then(() =>
+                ReminderModel.findOneAndUpdate(
+                  { _id: reminderIdObj },
+                  { $set: { email: emailId } }
+                )
+              );
+          })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function setSubreminderEmail(subreminderId, templateIds, values) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(subreminderId, 'subreminderId');
+        ValidationUtils.notNullOrEmpty(templateIds, 'templateIds');
+
+        templateIds.push('header');
+        templateIds.push('main-body');
+
+        const emailComponents = templateIds.map(templateId => {
+          let emailComponent = new EmailComponentModel({
+            _id: new mongoose.Types.ObjectId(),
+            templateId
+          });
+
+          if (templateId === 'main-body') {
+            ValidationUtils.notNullOrEmpty(values, 'values');
+            ValidationUtils.notNullOrEmpty(values.mainMessage, 'mainMessage');
+
+            emailComponent.values = { message: values.mainMessage };
+          } else if (templateId === 'do-it-now') {
+            ValidationUtils.notNullOrEmpty(values, 'values');
+            ValidationUtils.notNullOrEmpty(values.actionUrl, 'actionUrl');
+
+            emailComponent.values = { url: values.actionUrl };
+          }
+          return emailComponent;
+        });
+
+        const subreminderIdObj = new mongoose.Types.ObjectId(subreminderId);
+        deleteEmailsForSubReminder(subreminderIdObj);
+
+        Promise.all(emailComponents.map(comp => comp.save()))
+          .then(() => {
+            const emailId = new mongoose.Types.ObjectId();
+            const newEmail = new EmailModel({
+              _id: emailId,
+              subreminder: subreminderIdObj,
+              components: emailComponents
+            });
+            return newEmail
+              .save()
+              .then(() =>
+                SubreminderModel.findOneAndUpdate(
+                  { _id: subreminderIdObj },
+                  { $set: { email: emailId } }
+                )
+              );
+          })
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   return {
     findAll,
     deleteReminderById,
@@ -298,6 +433,8 @@ module.exports = (() => {
     createReminders,
     getUpcomingReminders,
     getReminders,
-    getSubReminders
+    getSubReminders,
+    setReminderEmail,
+    setSubreminderEmail
   };
 })();
