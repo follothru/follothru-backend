@@ -54,6 +54,23 @@ module.exports = (() => {
     }
   );
 
+  router.get('/:id/enrollInfo', (req, res) => {
+    const id = req.params.id;
+    CourseService.findCourseById(id)
+      .then(course => {
+        if (!course) {
+          throw new Error('Could not find course');
+        }
+        res.send(CoursePopulator.populatePublicFields(course));
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).send({
+          error: err.message
+        });
+      });
+  });
+
   router.put(
     '/:id',
     userAuthenticatorFactory([UserModelEnum.UserGroup.ADMIN]),
@@ -244,15 +261,59 @@ module.exports = (() => {
     }
   );
 
+  router.get('/:courseId/validateEnroll', (req, res) => {
+    const { courseId } = req.params;
+    const { email } = req.query;
+    CourseService.validateEnroll(courseId, email)
+      .then(() => res.send({ result: true, message: 'success' }))
+      .catch(err => {
+        console.error(err);
+        if (
+          err instanceof CourseService.Errors.EmailAlreadyRegisteredError ||
+          err instanceof CourseService.Errors.EmailNotVerifiedError
+        ) {
+          res.send({ result: false, code: err.type, message: err.message });
+          return;
+        }
+        res.status(500).send({ message: err.message });
+      });
+  });
+
+  router.get('/:courseId/student/:studentId/enrollStatus', (req, res) => {
+    const { courseId, studentId } = req.params;
+    CourseService.getStudentEnrollStatus(courseId, studentId)
+      .then(result =>
+        res.send({ verified: result.verified, email: result.email })
+      )
+      .catch(err => {
+        console.error(err);
+        res.status(500).send({
+          message: err.message
+        });
+      });
+  });
+
   router.post('/:courseId/student', (req, res) => {
     const { courseId } = req.params;
     const { prefName, email } = req.body;
     CourseService.studentEnroll(courseId, prefName, email)
-      .then(() => res.send({ message: 'Success' }))
+      .then(result =>
+        res.send({ studentId: result.studentId, courseId: result.courseId })
+      )
       .catch(err => {
         console.error(err);
+        if (
+          err instanceof CourseService.Errors.EmailAlreadyRegisteredError ||
+          err instanceof CourseService.Errors.EmailNotVerifiedError
+        ) {
+          res.status(400).send({
+            message: err.message,
+            type: err.type
+          });
+          return;
+        }
         res.status(500).send({
-          error: err.message
+          message: err.message
         });
       });
   });

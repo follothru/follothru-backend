@@ -12,21 +12,12 @@ module.exports = (() => {
       try {
         ValidationUtils.notNullOrEmpty(prefName, 'prefer name');
         ValidationUtils.notNullOrEmpty(email, 'email');
-        findStudentByEmail(email)
-          .then(result => {
-            // return existing student if email is found
-            if (result) {
-              resolve(result);
-            } else {
-              // create a new student if student doesn't exist
-              const _id = new mongoose.Types.ObjectId();
-              const newStudent = new StudentModel({ _id, prefName, email });
-              newStudent
-                .save()
-                .then(resolve)
-                .catch(reject);
-            }
-          })
+
+        const _id = new mongoose.Types.ObjectId();
+        const newStudent = new StudentModel({ _id, prefName, email });
+        newStudent
+          .save()
+          .then(resolve)
           .catch(reject);
       } catch (err) {
         reject(err);
@@ -47,5 +38,5 @@ module.exports = (() => {
     });
   }
 
-  return { findAllStudents, createNewStudent };
+  return { findAllStudents, createNewStudent, findStudentByEmail };
 })();

@@ -8,6 +8,28 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
   const EmailService = require('./email.service.js');
 
+  const EMAIL_ALREADY_REGISTERED = 'EMAIL_ALREADY_REGISTERED';
+  const EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED';
+
+  class EmailAlreadyRegisteredError extends Error {
+    constructor(message) {
+      super(message);
+      this.type = EMAIL_ALREADY_REGISTERED;
+    }
+  }
+
+  class EmailNotVerifiedError extends Error {
+    constructor(message) {
+      super(message);
+      this.type = EMAIL_NOT_VERIFIED;
+    }
+  }
+
+  const Errors = {
+    EmailAlreadyRegisteredError,
+    EmailNotVerifiedError
+  };
+
   function findAllCourses() {
     return CourseModel.find().populate('instructors');
   }
@@ -159,35 +181,126 @@ module.exports = (() => {
     });
   }
 
-  function addNewStudent(courseId, newStudent) {
+  function getStudentEnrollStatus(courseId, studentId) {
     return new Promise((resolve, reject) => {
-      CourseModel.findOne({ _id: courseId, students: { $in: newStudent._id } })
-        .then(result => {
-          if (result) {
-            reject({ message: 'user has already been registered in course' });
-          } else {
-            CourseModel.updateOne(
-              { _id: courseId },
-              { $push: { students: newStudent } }
-            )
-              .then(resolve)
-              .catch(reject);
-          }
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        ValidationUtils.notNullOrEmpty(studentId, 'studentId');
+
+        CourseModel.findOne({
+          _id: new mongoose.Types.ObjectId(courseId)
         })
-        .catch(err => {
-          reject(err);
-        });
+          .populate('students')
+          .then(course => {
+            if (!course) {
+              reject(new Error('The requested course dose not exist.'));
+              return;
+            }
+            return course.students;
+          })
+          .then(
+            students =>
+              students.filter(student => student._id.equals(studentId))[0]
+          )
+          .then(student => {
+            if (!student) {
+              reject(new Error('The requested student info is not found.'));
+              return;
+            }
+            return student;
+          })
+          .then(student =>
+            resolve({ email: student.email, verified: student.verified })
+          );
+      } catch (err) {
+        reject(err);
+      }
     });
+  }
+
+  function addNewStudentToCourse(courseIdObj, prefName, email) {
+    return StudentService.createNewStudent(prefName, email).then(newStudent =>
+      CourseModel.updateOne(
+        { _id: courseIdObj },
+        { $push: { students: newStudent } }
+      ).then(() => newStudent)
+    );
   }
 
   function studentEnroll(courseId, prefName, email) {
     return new Promise((resolve, reject) => {
-      StudentService.createNewStudent(prefName, email)
-        .then(newStudent =>
-          addNewStudent(new mongoose.Types.ObjectId(courseId), newStudent)
-        )
-        .then(resolve)
-        .catch(reject);
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        ValidationUtils.notNullOrEmpty(prefName, 'prefName');
+        ValidationUtils.notNullOrEmpty(email, 'email');
+
+        getStudentsEnrolled(courseId)
+          .then(
+            students => students.filter(student => student.email === email)[0]
+          )
+          .then(student => {
+            if (!student) {
+              return addNewStudentToCourse(
+                new mongoose.Types.ObjectId(courseId),
+                prefName,
+                email
+              );
+            }
+            if (student.verified) {
+              reject(
+                new EmailAlreadyRegisteredError(
+                  'This email has already been registered.'
+                )
+              );
+              return;
+            }
+            reject(
+              new EmailNotVerifiedError(
+                'This email has already been registered.'
+              )
+            );
+          })
+          .then(student => resolve({ studentId: student._id, courseId }))
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function validateEnroll(courseId, email) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(courseId, 'courseId');
+        ValidationUtils.notNullOrEmpty(email, 'email');
+
+        getStudentsEnrolled(courseId)
+          .then(
+            students => students.filter(student => student.email === email)[0]
+          )
+          .then(student => {
+            if (!student) {
+              resolve();
+              return;
+            }
+            if (student.verified) {
+              reject(
+                new EmailAlreadyRegisteredError(
+                  'This email has already been registered.'
+                )
+              );
+              return;
+            }
+            reject(
+              new EmailNotVerifiedError(
+                'This email has already been registered.'
+              )
+            );
+          })
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -225,6 +338,9 @@ module.exports = (() => {
     getSubreminderById,
     addEmailForSubreminder,
     addComponentsToEmail,
-    removeStudent
+    removeStudent,
+    getStudentEnrollStatus,
+    validateEnroll,
+    Errors
   };
 })();

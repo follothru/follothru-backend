@@ -20,5 +20,16 @@ module.exports = (() => {
     };
   }
 
-  return { populate };
+  function populatePublicFields(course) {
+    if (!course) {
+      return null;
+    }
+    return {
+      name: course.name,
+      hasPlanningPrompt: course.hasPlanningPrompt,
+      planningPrompt: course.planningPrompt
+    };
+  }
+
+  return { populate, populatePublicFields };
 })();
