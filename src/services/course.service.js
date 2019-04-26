@@ -30,22 +30,35 @@ module.exports = (() => {
     EmailNotVerifiedError
   };
 
-  function findAllCourses() {
-    return CourseModel.find().populate('instructors');
+  function findCourse(conditions) {
+    return CourseModel.findOne(conditions);
+  }
+
+  function findCourses(conditions) {
+    return conditions ? CourseModel.find(conditions) : CourseModel.find();
+  }
+
+  function findCourseById(id) {
+    return CourseModel.findById(id);
+  }
+
+  function populateStudents(coursePromise) {
+    return coursePromise.populate('students');
+  }
+
+  function populateInstructors(coursePromise) {
+    return coursePromise.populate('instructors');
+  }
+
+  function populateCourseFields(coursePromise) {
+    return populateStudents(populateInstructors(coursePromise));
   }
 
   function findAllCoursesForUser(user) {
     if (UserService.isSuperAdmin(user) || UserService.isAdmin(user)) {
-      return findAllCourses();
+      return findCourses().populate('instructors');
     }
-    return CourseModel.find({ instructors: user }).populate('instructors');
-  }
-
-  function findCourseById(id) {
-    return CourseModel.find({ _id: new mongoose.Types.ObjectId(id) })
-      .populate('instructors')
-      .populate('students')
-      .then(courses => courses[0]);
+    return findCourses({ instructors: user }).populate('instructors');
   }
 
   function createCourse(
@@ -89,7 +102,7 @@ module.exports = (() => {
     hasPlanningPrompt,
     planningPrompt
   ) {
-    return findCourseById(courseId).then(course => {
+    return populateCourseFields(findCourseById(courseId)).then(course => {
       if (name) {
         course.name = name;
       }
@@ -324,7 +337,6 @@ module.exports = (() => {
   }
 
   return {
-    findAllCourses,
     findAllCoursesForUser,
     createCourse,
     findCourseById,

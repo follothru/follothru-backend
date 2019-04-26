@@ -386,13 +386,10 @@ module.exports = (() => {
 
           if (templateId === 'main-body') {
             ValidationUtils.notNullOrEmpty(values, 'values');
-            ValidationUtils.notNullOrEmpty(values.mainMessage, 'mainMessage');
-
             emailComponent.values = { message: values.mainMessage };
           } else if (templateId === 'do-it-now') {
             ValidationUtils.notNullOrEmpty(values, 'values');
             ValidationUtils.notNullOrEmpty(values.actionUrl, 'actionUrl');
-
             emailComponent.values = { url: values.actionUrl };
           }
           return emailComponent;
