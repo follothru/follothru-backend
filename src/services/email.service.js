@@ -10,6 +10,14 @@ module.exports = (() => {
     return EmailModel.find().populate('components');
   }
 
+  function getEmailByReminderId(reminderId) {
+    reminderId =
+      reminderId instanceof mongoose.Types.ObjectId
+        ? reminderId
+        : new mongoose.Types.ObjectId(reminderId);
+    return EmailModel.findOne({ reminder: reminderId }).populate('components');
+  }
+
   function addComponentsToEmail(emailId, components) {
     return new Promise((resolve, reject) => {
       emailId = mongoose.Types.ObjectId(emailId);
@@ -108,6 +116,7 @@ module.exports = (() => {
   return {
     addEmail,
     getAllEmails,
+    getEmailByReminderId,
     addComponentsToEmail,
     sendEmail,
     getTemplates

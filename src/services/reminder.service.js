@@ -3,6 +3,7 @@ module.exports = (() => {
   const ValidationUtils = require('../utils/validation.util.js');
   const ActivityService = require('./activity.service.js');
   const EventService = require('./event.service.js');
+  const EmailService = require('./email.service.js');
   const { EmailModel, EmailComponentModel } = require('../models');
 
   const {
@@ -36,8 +37,9 @@ module.exports = (() => {
 
         const course = new mongoose.Types.ObjectId(courseId);
         const dates = generateDates(startDateTime, endDateTime, repeats);
-
+        const reminderId = new mongoose.Types.ObjectId();
         const reminder = new ReminderModel({
+          _id: reminderId,
           name,
           course
         });
@@ -75,6 +77,7 @@ module.exports = (() => {
             date =>
               new SubreminderModel({
                 name,
+                reminder: reminderId,
                 dateTime: date,
                 course
               })
@@ -316,6 +319,19 @@ module.exports = (() => {
     });
   }
 
+  function getReminderEmail(reminderId) {
+    return new Promise((resolve, reject) => {
+      try {
+        ValidationUtils.notNullOrEmpty(reminderId, 'reminderId');
+        EmailService.getEmailByReminderId(reminderId)
+          .then(resolve)
+          .catch(reject);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   function setReminderEmail(reminderId, templateIds, values) {
     return new Promise((resolve, reject) => {
       try {
@@ -425,6 +441,7 @@ module.exports = (() => {
 
   return {
     findAll,
+    getReminderEmail,
     deleteReminderById,
     getRemindersByCourseId,
     createReminders,
