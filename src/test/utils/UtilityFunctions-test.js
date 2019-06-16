@@ -45,6 +45,26 @@ describe('utilFunctions', () => {
       expect(actual).to.have.length(offsets.length);
       expect(actual).to.have.deep.members([expectedDate1, expectedDate2]);
     });
+
+    it('no offsets specified', () => {
+      const date = new Date(time);
+      const expectedDate = new Date(time);
+
+      const actual = offsetDate(date);
+
+      expect(actual).to.have.length(1);
+      expect(actual[0]).to.eql(expectedDate);
+    });
+
+    it('empty offsets', () => {
+      const date = new Date(time);
+      const expectedDate = new Date(time);
+
+      const actual = offsetDate(date, []);
+
+      expect(actual).to.have.length(1);
+      expect(actual[0]).to.eql(expectedDate);
+    });
   });
 
   describe('generateTimestamps', () => {
