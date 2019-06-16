@@ -20,7 +20,19 @@ ReminderSchema.statics.findReminderById = function (id) {
 }
 
 ReminderSchema.statics.deleteReminderById = function (id) {
-  return this.deleteOne({ _id: castObjectId(id) });
+  return this.findOneAndDelete({ _id: castObjectId(id) }, { $pull: { events: {} } }, function (err, deletedReminder) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    if (!deletedReminder) {
+      return;
+    }
+
+    const { events } = deletedReminder;
+    model('ReminderEventModel').deleteReminderEvents(events);
+  });
 }
 
 export default model('ReminderModel', ReminderSchema);
