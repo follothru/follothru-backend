@@ -2,6 +2,7 @@ import ReminderController from "./controllers/reminder/ReminderController";
 import CourseController from "./controllers/course/CourseController";
 import StudentController from "./controllers/student/StudentController";
 import express from 'express';
+import cors from 'cors';
 import configDatabase from "./configDatabase";
 import { port } from "./config";
 
@@ -10,6 +11,7 @@ const app = express();
 configDatabase();
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/reminder', ReminderController);
 
