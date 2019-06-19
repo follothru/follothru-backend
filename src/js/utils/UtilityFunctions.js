@@ -66,3 +66,9 @@ export const createModelPopulator = populator =>
   model => model instanceof Types.ObjectId ? model : populator(model);
 
 export const castObjectId = id => id instanceof String ? new Types.ObjectId(id) : id;
+
+export const getDatabaseReady = () => global.db_ready;
+
+export const setDatabaseReady = (ready = true) => {
+  global.db_ready = ready;
+}
