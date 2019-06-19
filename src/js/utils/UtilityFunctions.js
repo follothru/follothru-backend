@@ -15,7 +15,7 @@ const dateOffsetFunctions = {
  * @returns {Date[]}
  */
 export function offsetDate(date, offsets) {
-  if (!offsets) {
+  if (!offsets || offsets.length <= 0) {
     return [date];
   }
   const result = _.map(offsets, row => dateOffsetFunctions[row[0]](new Date(date.getTime()), row[1]));
