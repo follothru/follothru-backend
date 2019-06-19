@@ -1,6 +1,7 @@
 import express from 'express';
-import { populateReminders, populateReminder } from '../../common/populators/reminder/ReminderPopulator';
+import { populateReminders, populateReminder } from '../../common/populators/reminder/ReminderPopulators';
 import { types as errorTypes } from '../../common/errors';
+import { types as reminderErrorTypes } from '../../services/reminder/errors';
 import * as ReminderService from '../../services/reminder/ReminderService';
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const handleErrorResponse = (error, res) => {
       break;
 
     case errorTypes.DOCUMENT_NOT_FOUND_ERROR:
+    case reminderErrorTypes.REMINDER_NOT_FOUND:
       status = 404;
       break;
 
@@ -41,13 +43,6 @@ router.get('/', (req, res) => {
 router.get('/:reminderId', (req, res) => {
   const { reminderId } = req.params;
   ReminderService.getReminderById(reminderId)
-    .then(reminder => res.send(populateReminder(reminder)))
-    .catch(err => handleErrorResponse(err, res));
-});
-
-router.post('/', (req, res) => {
-  const { name, message, startDate, endDate, repeats, offsets } = req.body;
-  ReminderService.createReminder(name, message, new Date(startDate), new Date(endDate), repeats, offsets)
     .then(reminder => res.send(populateReminder(reminder)))
     .catch(err => handleErrorResponse(err, res));
 });

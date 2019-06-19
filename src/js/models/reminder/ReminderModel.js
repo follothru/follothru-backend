@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 const ReminderSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, auto: true },
+  course: { type: Schema.Types.ObjectId, ref: 'CourseModel' },
   name: String,
   startDate: Date,
   message: String,
@@ -20,7 +21,7 @@ ReminderSchema.statics.findReminderById = function (id) {
 }
 
 ReminderSchema.statics.deleteReminderById = function (id) {
-  return this.findOneAndDelete({ _id: castObjectId(id) }, { $pull: { events: {} } }, function (err, deletedReminder) {
+  return this.findOneAndDelete({ _id: castObjectId(id) }, function (err, deletedReminder) {
     if (err) {
       console.error(err);
       return;

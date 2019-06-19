@@ -4,7 +4,10 @@ import _ from 'lodash';
 
 const ReminderNotificationSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, auto: true },
-  dateTime: Date
+  sent: { type: Boolean, default: false },
+  dateTime: Date,
+  studentGroup: { type: Schema.Types.ObjectId, ref: 'StudentGroupModel' },
+  meta: { type: Object, default: {} }
 });
 
 ReminderNotificationSchema.statics.deleteReminderNotifications = function (ids) {
