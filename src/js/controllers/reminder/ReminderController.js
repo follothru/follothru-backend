@@ -3,6 +3,7 @@ import { populateReminders, populateReminder } from '../../common/populators/rem
 import { types as errorTypes } from '../../common/errors';
 import { types as reminderErrorTypes } from '../../services/reminder/errors';
 import * as ReminderService from '../../services/reminder/ReminderService';
+import * as auth from '../../utils/authUtils';
 
 const router = express.Router();
 
@@ -34,20 +35,20 @@ const handleErrorResponse = (error, res) => {
   console.error(error);
 };
 
-router.get('/', (req, res) => {
+router.get('/', auth.required, (req, res) => {
   ReminderService.getReminders()
     .then(reminders => res.send(populateReminders(reminders)))
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.get('/:reminderId', (req, res) => {
+router.get('/:reminderId', auth.required, (req, res) => {
   const { reminderId } = req.params;
   ReminderService.getReminderById(reminderId)
     .then(reminder => res.send(populateReminder(reminder)))
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.delete('/:reminderId', (req, res) => {
+router.delete('/:reminderId', auth.required, (req, res) => {
   const { reminderId } = req.params;
   ReminderService.deleteReminder(reminderId)
     .then(() => res.end())
