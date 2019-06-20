@@ -4,6 +4,7 @@ import { populateReminder } from '../../common/populators/reminder/ReminderPopul
 import { types as courseErrorTypes } from '../../services/course/errors';
 import { types as errorTypes } from '../../common/errors';
 import * as CourseService from '../../services/course/CourseService';
+import * as auth from '../../utils/authUtils';
 
 const router = express.Router();
 
@@ -34,27 +35,27 @@ const handleErrorResponse = (error, res) => {
   console.error(error);
 };
 
-router.get('/', (req, res) => {
+router.get('/', auth.required, (req, res) => {
   CourseService.findAllCourses()
     .then(courses => res.send(populateCourses(courses)))
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.post('/', (req, res) => {
+router.post('/', auth.required, (req, res) => {
   const { name } = req.body;
   CourseService.createCourse(name)
     .then(newCourse => res.send(populateCourse(newCourse)))
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.delete('/:courseId', (req, res) => {
+router.delete('/:courseId', auth.required, (req, res) => {
   const { courseId } = req.params;
   CourseService.deleteCourseById(courseId)
     .then(() => res.send())
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.post('/:courseId/reminder', (req, res) => {
+router.post('/:courseId/reminder', auth.required, (req, res) => {
   const { courseId } = req.params;
   const { name, message, startDate, endDate, repeats, offsets, meta } = req.body;
   CourseService.createReminderForCourse(courseId, name, message, new Date(startDate), new Date(endDate), repeats, offsets, meta)
@@ -62,7 +63,7 @@ router.post('/:courseId/reminder', (req, res) => {
     .catch(err => handleErrorResponse(err, res));
 });
 
-router.put('/:courseId/student', (req, res) => {
+router.put('/:courseId/student', auth.optional, (req, res) => {
   const { courseId } = req.params;
   const { studentId } = req.body;
   CourseService.studentEnroll(courseId, studentId)

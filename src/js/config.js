@@ -11,3 +11,5 @@ export const devMongoDatabaseUrl = 'mongodb://mongo:27017/follothru';
 export const mongoDatabaseUrl = nodeEnv === 'prod' ?
   `mongodb+srv://follothru:${encodeURI(dbPassword)}@follothru-db-rsgd2.mongodb.net/test?retryWrites=true&w=majority`
   : devMongoDatabaseUrl;
+
+export const secretKey = process.env.SECRET_KEY;
