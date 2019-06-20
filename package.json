@@ -1,12 +1,13 @@
 {
   "name": "follothru-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "FolloThru backend",
   "main": "src/index.js",
   "scripts": {
     "start": "npm run build && node ./dist/js",
     "start-prod": "npm run build && NODE_ENV=\"prod\" npm run start",
     "build": "rm -R -f dist/ && babel -d dist/ src/",
+    "docker-build": "docker build -t follothru/follothru .",
     "test": "npm run build && mocha dist/test/**/*-test.js"
   },
   "author": "Jianhao Xu",
@@ -29,5 +30,6 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "validator": "^11.0.0"
-  }
+  },
+  "repository": "https://github.com/follothru/follothru-backend.git"
 }
