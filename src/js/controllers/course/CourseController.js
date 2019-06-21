@@ -1,6 +1,6 @@
 import express from 'express';
 import { populateCourse, populateCourses } from '../../common/populators/course/CoursePopulators';
-import { populateReminder } from '../../common/populators/reminder/ReminderPopulators';
+import { populateReminder, populateReminders } from '../../common/populators/reminder/ReminderPopulators';
 import { types as courseErrorTypes } from '../../services/course/errors';
 import { types as errorTypes } from '../../common/errors';
 import * as CourseService from '../../services/course/CourseService';
@@ -36,14 +36,16 @@ const handleErrorResponse = (error, res) => {
 };
 
 router.get('/', auth.required, (req, res) => {
-  CourseService.findAllCourses()
+  const { _id } = req.user;
+  CourseService.findAllCourses(_id)
     .then(courses => res.send(populateCourses(courses)))
     .catch(err => handleErrorResponse(err, res));
 });
 
 router.post('/', auth.required, (req, res) => {
   const { name } = req.body;
-  CourseService.createCourse(name)
+  const { _id } = req.user;
+  CourseService.createCourse(name, _id)
     .then(newCourse => res.send(populateCourse(newCourse)))
     .catch(err => handleErrorResponse(err, res));
 });
@@ -52,6 +54,13 @@ router.delete('/:courseId', auth.required, (req, res) => {
   const { courseId } = req.params;
   CourseService.deleteCourseById(courseId)
     .then(() => res.send())
+    .catch(err => handleErrorResponse(err, res));
+});
+
+router.get('/:courseId/reminder', auth.required, (req, res) => {
+  const { courseId } = req.params;
+  CourseService.getRemindersForCourse(courseId)
+    .then(reminders => res.send(populateReminders(reminders)))
     .catch(err => handleErrorResponse(err, res));
 });
 

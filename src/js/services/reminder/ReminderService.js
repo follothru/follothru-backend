@@ -38,6 +38,20 @@ export const getReminderById = reminderId => {
   });
 };
 
+export const getRemindersForCourse = courseId => new Promise((resolve, reject) => {
+  try {
+    notEmpty(courseId, 'courseId');
+
+    courseId = castObjectId(courseId);
+    ReminderModel.find({ course: courseId })
+      .then(resolve)
+      .catch(reject);
+  } catch (err) {
+    console.error(err);
+    reject(err);
+  }
+});
+
 const processMeta = meta => Object.assign({}, meta, { finishedLink: 'https://www.google.ca' });
 
 export const createReminder = (courseId, name, message, startDate, endDate, repeats, offsets, meta = {}) =>
