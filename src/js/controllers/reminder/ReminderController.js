@@ -35,12 +35,6 @@ const handleErrorResponse = (error, res) => {
   console.error(error);
 };
 
-router.get('/', auth.required, (req, res) => {
-  ReminderService.getReminders()
-    .then(reminders => res.send(populateReminders(reminders)))
-    .catch(err => handleErrorResponse(err, res));
-});
-
 router.get('/:reminderId', auth.required, (req, res) => {
   const { reminderId } = req.params;
   ReminderService.getReminderById(reminderId)

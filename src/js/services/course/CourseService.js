@@ -2,11 +2,26 @@ import CourseModel from "../../models/course/CourseModel";
 import { notEmpty } from "../../utils/ValidationUtils";
 import { castObjectId } from "../../utils/UtilityFunctions";
 import { CourseNotFoundError } from "./errors";
+import _ from 'lodash';
 import * as ReminderService from "../reminder/ReminderService";
 import * as StudentGroupService from "../student/StudentGroupService";
+import * as UserService from "../user/UserService";
 
-export function findAllCourses() {
-  return CourseModel.find();
+export function findAllCourses(userId) {
+  return new Promise((resolve, reject) => {
+    try {
+      notEmpty(userId, "userId");
+
+      UserService.findUserById(userId)
+        .then(user => _.concat(user.ownedCourses, user.involvedCourses))
+        .then(courseIds => CourseModel.find({ _id: { $in: courseIds } }))
+        .then(resolve)
+        .catch(reject);
+    } catch (err) {
+      console.error(err);
+      reject(err);
+    }
+  });
 }
 
 export function findCourseById(courseId) {
@@ -28,12 +43,18 @@ export function findCourseById(courseId) {
   });
 }
 
-export function createCourse(name) {
+export function createCourse(name, userId) {
   return new Promise((resolve, reject) => {
     try {
       notEmpty(name, 'name');
       const newCourse = new CourseModel({ name });
-      newCourse.save().then(resolve).catch(reject);
+      newCourse.save()
+        .then(course =>
+          UserService.addOwnedCourseToUser(userId, course._id)
+            .then(() => course)
+        )
+        .then(resolve)
+        .catch(reject);
     } catch (err) {
       console.error(err);
       reject(err);
@@ -70,6 +91,21 @@ export function studentEnroll(courseId, studentId) {
           const { studentGroup } = course;
           return StudentGroupService.addStudentToStudentGroup(studentId, studentGroup);
         })
+        .then(resolve)
+        .catch(reject);
+    } catch (err) {
+      console.error(err);
+      reject(err);
+    }
+  });
+}
+
+export function getRemindersForCourse(courseId) {
+  return new Promise((resolve, reject) => {
+    try {
+      notEmpty(courseId, 'courseId');
+
+      ReminderService.getRemindersForCourse(courseId)
         .then(resolve)
         .catch(reject);
     } catch (err) {
