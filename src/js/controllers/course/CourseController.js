@@ -50,6 +50,13 @@ router.post('/', auth.required, (req, res) => {
     .catch(err => handleErrorResponse(err, res));
 });
 
+router.get('/:courseId', auth.required, (req, res) => {
+  const { courseId } = req.params;
+  CourseService.findCourseById(courseId)
+    .then(course => res.send(populateCourse(course)))
+    .catch(err => handleErrorResponse(err, res));
+});
+
 router.delete('/:courseId', auth.required, (req, res) => {
   const { courseId } = req.params;
   CourseService.deleteCourseById(courseId)
