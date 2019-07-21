@@ -10,17 +10,17 @@ export const populateReminderMessages = reminderMessages =>
   _.map(reminderMessages, createModelPopulator(populateReminderMessage));
 
 export const populateReminderNotification = reminderNotification => {
-  const { dateTime } = reminderNotification;
-  return { dateTime };
+  const { _id, dateTime } = reminderNotification;
+  return { id: _id, dateTime };
 };
 
 export const populateReminderNotifications = reminderNotifications =>
   _.map(reminderNotifications, createModelPopulator(populateReminderNotification));
 
 export const populateReminderEvent = reminderEvent => {
-  const { dateTime } = reminderEvent;
+  const { _id, dateTime } = reminderEvent;
   const notifications = populateReminderNotifications(reminderEvent.notifications);
-  return { dateTime, notifications };
+  return { id: _id, dateTime, notifications };
 };
 
 export const populateReminderEvents = reminderEvents =>

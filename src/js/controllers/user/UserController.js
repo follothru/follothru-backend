@@ -32,6 +32,11 @@ const handleErrorResponse = (error, res) => {
   console.error(error);
 };
 
+router.get('/', auth.required, (req, res) => {
+  const { user } = req;
+  res.send(populateUser(user));
+});
+
 router.post('/', auth.optional, (req, res) => {
   const { preferName, email, password } = req.body;
   UserService.createNewUser(preferName, email, password)

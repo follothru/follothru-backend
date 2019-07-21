@@ -44,6 +44,14 @@ export const getRemindersForCourse = courseId => new Promise((resolve, reject) =
 
     courseId = castObjectId(courseId);
     ReminderModel.find({ course: courseId })
+      .populate({
+        path: 'events',
+        model: 'ReminderEventModel',
+        populate: {
+          path: 'notifications',
+          model: 'ReminderNotificationModel'
+        }
+      })
       .then(resolve)
       .catch(reject);
   } catch (err) {
