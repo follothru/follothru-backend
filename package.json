@@ -29,7 +29,7 @@
     "mongoose": "^5.5.14",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "validator": "^11.0.0"
+    "validator": "^13.7.0"
   },
   "repository": "https://github.com/follothru/follothru-backend.git"
 }
